@@ -1,0 +1,2 @@
+class: org.apache.uima.tutorial.ex4.MeetingAnnotator
+WindowSize: 200

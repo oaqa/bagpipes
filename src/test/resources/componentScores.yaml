@@ -1,0 +1,15 @@
+scores:
+   - inherit: tutorial.ex3.RoomNumberAnnotator
+     cost: 0.4
+     benefit: 0.8
+   - inherit: tutorial.ex3.SimpleTutorialDateTime #does not recognize short dates (fail to annotate meeting) 
+     cost: 0.4
+     benefit: 0.9
+   - inherit: tutorial.ex3.TutorialDateTime #recognizes short dates (succeeds to annotate meeting)
+     cost: 0.4
+     benefit: 1.0
+   - inherit: tutorial.ex4.MeetingAnnotator
+     cost: 0.4
+     benefit: 0.8
+                    
+        

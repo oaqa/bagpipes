@@ -1,0 +1,13 @@
+class: components.CrossOpted
+
+params:
+  test: param1
+cross-opts:
+  opt1: [a,b,c]
+  opt2: [1,2]
+
+#
+# Should result in:
+# [[a,1],[a,2],[b,1],[b,2],[c,1],[c,2]]
+#
+  

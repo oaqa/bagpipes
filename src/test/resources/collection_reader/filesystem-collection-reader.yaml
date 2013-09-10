@@ -1,0 +1,5 @@
+class: org.apache.uima.examples.cpe.FileSystemCollectionReader
+params:
+    Language: en
+    BrowseSubdirectories: FALSE
+    Encoding: UTF-8 
