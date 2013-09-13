@@ -4,6 +4,8 @@
 	<groupId>edu.cmu.lti.oaqa</groupId>
 	<artifactId>bagpipes</artifactId>
 	<version>0.1</version>
+	<name>Bagpipes</name>
+	<description>A second-generation configuration space exploration framework</description>
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
 		<artifactId>oss-parent</artifactId>
@@ -133,25 +135,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.apache.uima</groupId>
-			<artifactId>uimaj-core</artifactId>
-			<version>2.4.0</version>
-		</dependency>
-		<dependency>
 			<groupId>org.uimafit</groupId>
 			<artifactId>uimafit</artifactId>
 			<version>1.4.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>12.0</version>
-			<type>jar</type>
-		</dependency>
-		<dependency>
-			<groupId>mx.bigdata.anyobject</groupId>
-			<artifactId>anyobject</artifactId>
-			<version>1.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -159,40 +145,8 @@
 			<version>4.10</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-all</artifactId>
-			<version>1.1</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<version>1.9.0</version>
-			<scope>test</scope>
-		</dependency>
 
-		<dependency>
-			<groupId>edu.cmu.lti.oaqa.ecd</groupId>
-			<artifactId>uima-ecd</artifactId>
-			<version>2.3.2</version>
-			<exclusions>
-				<exclusion>
-					<groupId>net.sf.josql</groupId> <!-- Exclude Project-D from Project-B -->
-					<artifactId>josql</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>net.sf.josql</groupId> <!-- Exclude Project-D from Project-B -->
-					<artifactId>gentlyweb-utils</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
 
-		<dependency>
-			<groupId>org.apache.uima</groupId>
-			<artifactId>uimaj-examples</artifactId>
-			<version>2.4.0</version>
-		</dependency>
 
 		<dependency>
 			<groupId>net.liftweb</groupId>
@@ -225,14 +179,4 @@
 			<version>2.2.1</version>
 		</dependency>
 	</dependencies>
-
-
-<<<<<<< HEAD
-
-	<artifactId>bagpipes</artifactId>
-	<version>0.1</version>
-	<name>Bagpipes</name>
-	<description>A second-generation configuration space exploration framework</description>
-=======
->>>>>>> 78e629afa23c64955d2e8a51da9c156c18af9822
 </project>
