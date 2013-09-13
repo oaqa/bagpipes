@@ -4,13 +4,13 @@
 	<groupId>edu.cmu.lti.oaqa</groupId>
 	<artifactId>bagpipes</artifactId>
 	<version>0.1</version>
-	<name>Bagpipes</name>
-	<description>A second-generation configuration space exploration framework</description>
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
 		<artifactId>oss-parent</artifactId>
 		<version>7</version>
 	</parent>
+	<name>Bagpipes</name>
+	<description>A second-generation configuration space exploration framework</description>
 	<url>https://github.com/oaqa/bagpipes</url>
 	<issueManagement>
 		<system>github.com</system>
