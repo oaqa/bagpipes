@@ -1,12 +1,27 @@
-# Compiled Files #
+# use glob syntax.
+syntax: glob
+*.ser
 *.class
+*~
+*.bak
+*.old
 
-# Package Files #
-*.jar
-*.war
-*.ear
-/target
-
-# Eclipse Files #
-.metadata/*
+# eclipse conf file
+.manager
+.scala_dependencies
 .cache
+
+# building
+target
+build
+null
+tmp*
+temp*
+dist
+test-output
+build.log
+
+# other scm
+.svn
+.CVS
+.hg*
