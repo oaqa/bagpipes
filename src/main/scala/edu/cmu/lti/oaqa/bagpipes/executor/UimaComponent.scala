@@ -1,6 +1,6 @@
 package edu.cmu.lti.oaqa.bagpipes.executor
 
-import org.uimafit.factory.TypeSystemDescriptionFactory
+import org.apache.uima.fit.factory.TypeSystemDescriptionFactory
 import org.apache.uima.jcas.JCas
 
 abstract class UimaComponent(cls: Class[_], params: List[_]) extends ExecutableComponent[JCas]{

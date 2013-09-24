@@ -2,8 +2,8 @@ package edu.cmu.lti.oaqa.bagpipes.executor
 
 import org.apache.uima.collection.CollectionReader
 import org.apache.uima.jcas.JCas
-import org.uimafit.factory.CollectionReaderFactory
-import org.uimafit.factory.JCasFactory
+import org.apache.uima.fit.factory.CollectionReaderFactory
+import org.apache.uima.fit.factory.JCasFactory
 
 /**
  * Instantiate and use any arbitrary UIMA Collection Reader to feed a pipeline.
