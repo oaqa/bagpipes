@@ -10,10 +10,23 @@ import net.liftweb.json.JsonAST.JDouble
 import Parameters.Parameter
 import edu.cmu.lti.oaqa.bagpipes.configuration.Parameters._
 
+/**
+ * All the case classes needed for a configuration descriptor.
+ *
+ * ConfigurationDescriptor: top-level descriptor
+ * Configuration: name and author metadata
+ * CollectionReaderDescriptor: the class and parameters for the collection reader
+ * PhaseDescriptor: metadata for which options will be executed in this phase
+ * ComponentDescriptor: class and parameter for any executable annotator
+ * CrossComponentDescriptor: metadata for which parameters will be combined in this `cross-opts`
+ * ScoreDescriptor: //yet-to-be implemented
+ * @author Avner Maiberg (amaiberg@cs.cmu.edu)
+ */
+
 object Descriptors {
   sealed trait ExecutableConf //extends ExecutableDescriptor with ConfExpr
   sealed trait Testable //extends ExecutableDescriptor with ConfExpr
- 
+
   sealed trait ExecutableComponent extends ExecutableConf
   case class ConfigurationDescriptor(configuration: Configuration, `collection-reader`: ComponentDescriptor, pipeline: List[PhaseDescriptor])
   case class Configuration(name: String = "default-config", author: String = "default-author")

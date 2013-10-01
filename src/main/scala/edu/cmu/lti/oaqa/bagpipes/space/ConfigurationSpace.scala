@@ -36,6 +36,7 @@ import edu.cmu.lti.oaqa.bagpipes.configuration.Parameters._
  * std:  s_3_0  s_3_0   s_3_0  s_3_0   s_3_0   s_3_0
  * }}}
  *
+ * @author Avner Maiberg (amaiberg@cs.cmu.edu)
  */
 class ConfigurationSpace(confDes: ConfigurationDescriptor) {
   import ConfigurationSpace._

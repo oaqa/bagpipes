@@ -7,6 +7,7 @@ package edu.cmu.lti.oaqa.bagpipes.configuration {
    * edu.cmu.lti.oaqa.cse.scala.configuration
    * @define confDes $packagePath.ConfigurationDescriptors.ConfigurationDescriptor
    *
+   * @author Avner Maiberg (amaiberg@cs.cmu.edu)
    */
 
 }

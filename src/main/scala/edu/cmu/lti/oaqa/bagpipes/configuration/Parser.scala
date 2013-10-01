@@ -69,6 +69,8 @@ import net.liftweb.json.TypeHints
  * @see [[$packagePath.Implicits]]
  * @see [[$packagePath.ConfigurationDescriptors]]
  * @see [[$packagePath.ParserUtils]]
+ *
+ * @author Avner Maiberg (amaiberg@cs.cmu.edu)
  */
 
 trait Parser {
@@ -178,7 +180,7 @@ trait Parser {
       val flattenedConfMap = flattenComponent(confMap, v)
       extractComponent(flattenedConfMap)
     }
-   // case ("collection-reader", v: String) => extract[CollectionReaderDescriptor](flattenComponent(confMap,v))
+    // case ("collection-reader", v: String) => extract[CollectionReaderDescriptor](flattenComponent(confMap,v))
     //else just recursively flatten the map
     case _ => flattenConfMap(confMap)
   }

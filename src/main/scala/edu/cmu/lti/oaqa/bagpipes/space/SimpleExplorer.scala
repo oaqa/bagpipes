@@ -6,6 +6,8 @@ import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.ExecutableConf
 /**
  * SimpleExplorer provides a depth/breadth-first (given by the specified
  * `Ordering`) traversal of all the nodes in a configuration space.
+ *
+ * @author Avner Maiberg (amaiberg@cs.cmu.edu)
  */
 
 protected sealed class SimpleExplorer(order: Ordering) extends Explorer[ExecutableConf] {

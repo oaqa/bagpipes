@@ -5,6 +5,14 @@ import scala.collection.JavaConversions._
 import net.liftweb.json.Serialization
 import net.liftweb.json.ShortTypeHints
 import edu.cmu.lti.oaqa.bagpipes.configuration._
+
+/**
+ * Some implicit methods to help convert from Java types to Scala types, and
+ * to retrieve typesafe parameters from a heterogeneous map.
+ * 
+ * @author Avner Maiberg (amaiberg@cs.cmu.edu)
+ */
+
 object Implicits {
   class MapWithRestrictTo[A, That](from: Map[A, That]) {
     def restrictTo[B](implicit m: scala.reflect.Manifest[B]): Map[A, B] = {

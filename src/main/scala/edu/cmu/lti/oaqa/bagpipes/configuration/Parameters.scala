@@ -1,5 +1,11 @@
 package edu.cmu.lti.oaqa.bagpipes.configuration
 
+/**
+ * Case classes for all the parameters used in the configuration descriptors.
+ *
+ * @author Avner Maiberg (amaiberg@cs.cmu.edu)
+ */
+
 object Parameters {
   sealed trait Parameter
   case class IntegerParameter(value: Int) extends Parameter

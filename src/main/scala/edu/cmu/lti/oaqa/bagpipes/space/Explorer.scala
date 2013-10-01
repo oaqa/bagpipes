@@ -4,7 +4,12 @@ import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.ExecutableConf
 import SimpleExplorer._
 
 /**
- * Provides some traversal over a configuration space tree in the form of a [[Stream]] 
+ * Provides some traversal over a configuration space tree in the form of a [[Stream]].
+ *
+ * Abstract method `from` provides the stream of nodes given by the traversal strategy
+ * of this [[Explorer]].
+ *
+ * @author Avner Maiberg (amaiberg@cs.cmu.edu)
  */
 
 trait Explorer[T] extends HistoryTypes[T] {
@@ -14,7 +19,7 @@ trait Explorer[T] extends HistoryTypes[T] {
 /**
  * Convenience types for retaining the trace "history" for each of the explored
  * nodes. Implicit methods help convert from nodes to leaves for simplicity's
- * sake. 
+ * sake.
  */
 trait HistoryTypes[T] {
   type TreeWithHistory = (Tree[T], Stream[Leaf[T]])

@@ -9,6 +9,8 @@ import scala.collection.JavaConverters._
 /**
  * A concrete implementation of [[$packagePath.Parser]] for loading in YAML
  * configuration descriptors.
+ *
+ * @author Avner Maiberg (amaiberg@cs.cmu.edu)
  */
 
 object YAMLParser extends Parser {

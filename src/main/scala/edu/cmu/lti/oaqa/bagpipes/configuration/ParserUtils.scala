@@ -11,6 +11,8 @@ import net.liftweb.json.ShortTypeHints
 
 /**
  * A collection of utility methods used by [[$packagePath.Parser]].
+ *
+ * @author Avner Maiberg (amaiberg@cs.cmu.edu)
  */
 
 object ParserUtils {
