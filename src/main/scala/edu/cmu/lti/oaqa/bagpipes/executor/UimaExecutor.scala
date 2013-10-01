@@ -4,10 +4,10 @@ import org.apache.uima.analysis_component.AnalysisComponent
 import org.apache.uima.collection.CollectionReader
 import org.apache.uima.UIMAFramework
 import org.apache.uima.util.CasCopier
-import org.uimafit.factory.AnalysisEngineFactory
-import org.uimafit.factory.CollectionReaderFactory
-import org.uimafit.factory.JCasFactory
-import org.uimafit.factory.TypeSystemDescriptionFactory
+import org.apache.uima.fit.factory.AnalysisEngineFactory
+import org.apache.uima.fit.factory.CollectionReaderFactory
+import org.apache.uima.fit.factory.JCasFactory
+import org.apache.uima.fit.factory.TypeSystemDescriptionFactory
 import edu.cmu.lti.oaqa.bagpipes.util.TraceUtil
 import org.apache.uima.jcas.JCas
 

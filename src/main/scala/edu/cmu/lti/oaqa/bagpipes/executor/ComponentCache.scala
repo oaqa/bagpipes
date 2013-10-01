@@ -1,8 +1,6 @@
 package edu.cmu.lti.oaqa.bagpipes.executor
 
-import org.apache.uima.analysis_engine.AnalysisEngine
 import scala.collection.immutable.HashMap
-import org.apache.uima.analysis_component.AnalysisComponent_ImplBase
 import org.apache.uima.jcas.JCas
 
 /**

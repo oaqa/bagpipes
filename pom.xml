@@ -29,52 +29,51 @@
 			<version>${scala.version}</version>
 		</dependency>
 
-		<!-- Test -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.11</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.specs2</groupId>
-			<artifactId>specs2_${scala.tools.version}</artifactId>
-			<version>1.13</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.scalatest</groupId>
-			<artifactId>scalatest_${scala.tools.version}</artifactId>
-			<version>2.0.M6-SNAP8</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.uimafit</groupId>
-			<artifactId>uimafit</artifactId>
-			<version>1.4.0</version>
-		</dependency>
-		<dependency>
-			<groupId>net.liftweb</groupId>
-			<artifactId>lift-json_2.10</artifactId>
-			<version>2.5.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.xerial</groupId>
-			<artifactId>sqlite-jdbc</artifactId>
-			<version>3.7.15-M1</version>
-		</dependency>
-		<dependency>
-			<groupId>com.typesafe.slick</groupId>
-			<artifactId>slick_2.10</artifactId>
-			<version>1.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.yaml</groupId>
-			<artifactId>snakeyaml</artifactId>
-			<version>1.10</version>
-		</dependency>
-	</dependencies>
-
+   <!-- Test -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.specs2</groupId>
+      <artifactId>specs2_${scala.tools.version}</artifactId>
+      <version>1.13</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.scalatest</groupId>
+      <artifactId>scalatest_${scala.tools.version}</artifactId>
+      <version>2.0.M6-SNAP8</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>org.apache.uima</groupId>
+    	<artifactId>uimafit-core</artifactId>
+    	<version>2.0.0</version>
+    </dependency>
+    <dependency>
+    	<groupId>net.liftweb</groupId>
+    	<artifactId>lift-json_2.10</artifactId>
+    	<version>2.5.1</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.xerial</groupId>
+    	<artifactId>sqlite-jdbc</artifactId>
+    	<version>3.7.15-M1</version>
+    </dependency>
+    <dependency>
+    	<groupId>com.typesafe.slick</groupId>
+    	<artifactId>slick_2.10</artifactId>
+    	<version>1.0.1</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.yaml</groupId>
+    	<artifactId>snakeyaml</artifactId>
+    	<version>1.10</version>
+    </dependency>
+  </dependencies>
 	<build>
 		<sourceDirectory>src/main/scala</sourceDirectory>
 		<testSourceDirectory>src/test/scala</testSourceDirectory>

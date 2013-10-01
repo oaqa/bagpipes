@@ -1,8 +1,6 @@
 package edu.cmu.lti.oaqa.bagpipes.executor
 
 import org.apache.uima.jcas.JCas
-import org.uimafit.factory.AnalysisEngineFactory
-import org.apache.uima.UIMAFramework
 import org.apache.uima.analysis_component.AnalysisComponent
 
 /**
