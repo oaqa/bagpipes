@@ -112,16 +112,16 @@ object ConfigurationSpace {
       case Node(elem, children) => expand(elem).map(Node(_, children))
     }
 
-    /*perform a depth-first search of the tree applying expand to all of the nodes*/
+    /*perform a depth-first traversal of the tree applying expand to all of the nodes*/
     def expandNodes(expand: NodeExpander, confSpace: Tree[ExecutableConf]): Tree[ExecutableConf] = confSpace match {
       case Leaf(elem) => Leaf(elem)
       case Node(elem, children) => Node(elem, children.flatMap(expandNode(expand, _)).map(expandNodes(expand, _)))
     }
-
     expandNodes(expand, confSpace)
   }
 
   /**
+   *
    *
    */
   def crossOptsExpander[K, V](elem: ExecutableConf): Stream[ExecutableConf] = {
