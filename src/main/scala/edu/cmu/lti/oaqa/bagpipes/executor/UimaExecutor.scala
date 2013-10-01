@@ -22,8 +22,8 @@ class UimaExecutor extends Executor[JCas, UimaComponent] {
   val comps = new ComponentCache[UimaComponent]()
   // Instance variable place holders
   var reader:Reader = _
-  // Keep which input we're currently using so that no two two JCas's from any 
-  // run of a pipeline will have the same trace.
+  // Keep track of which input we're currently using so that no two JCas's  
+  // from any run of a pipeline will have the same trace.
   var inputCount = 0
   
   /**
