@@ -20,7 +20,7 @@ class Annotator(cls: Class[_ <: AnalysisComponent], params: List[(String, Any)])
   import UimaComponent.flattenParams
   
   // Create AnalysisEngine internally
-  val aeDescriptor = AnalysisEngineFactory.createPrimitiveDescription(cls, UimaComponent.typeSysDesc, params:_*)
+  val aeDescriptor = AnalysisEngineFactory.createEngineDescription(cls, UimaComponent.typeSysDesc, params:_*)
   val ae = UIMAFramework.produceAnalysisEngine(aeDescriptor)
   
   /**
