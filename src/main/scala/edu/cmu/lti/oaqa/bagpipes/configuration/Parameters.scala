@@ -1,5 +1,8 @@
 package edu.cmu.lti.oaqa.bagpipes.configuration
 
+import java.util.Arrays
+import java.util.HashMap
+
 /**
  * Case classes for all the parameters used in the configuration descriptors.
  *
@@ -7,16 +10,18 @@ package edu.cmu.lti.oaqa.bagpipes.configuration
  */
 
 object Parameters {
-  sealed trait Parameter
-  case class IntegerParameter(value: Int) extends Parameter
-  case class StringParameter(value: String) extends Parameter
-  case class DoubleParameter(value: Double) extends Parameter
-  case class BooleanParameter(value: Boolean) extends Parameter
-  case class ListParameter(pList: List[Parameter]) extends Parameter
-  case class MapParameter(map: Map[String, Parameter]) extends Parameter
+  sealed abstract class Parameter(elem: Any) {
+    def getElem = elem 
+  }
+  case class IntegerParameter(value: Int) extends Parameter(value)
+  case class StringParameter(value: String) extends Parameter(value)
+  case class DoubleParameter(value: Double) extends Parameter(value)
+  case class BooleanParameter(value: Boolean) extends Parameter(value)
+  case class ListParameter(pList: List[Parameter]) extends Parameter(pList.map(p => p.getElem))
+  case class MapParameter(map: Map[String, Parameter]) extends Parameter(map.map { case (k, v) => (k -> v.getElem) })
 
   implicit def primitive2Parameter(value: Any): Parameter = value match {
-    case v: Int => IntegerParameter(v)
+    case v: Int => IntegerParameter(v) 
     case v: String => StringParameter(v)
     case v: Double => DoubleParameter(v)
     case v: Boolean => BooleanParameter(v)
@@ -24,5 +29,4 @@ object Parameters {
     case pmap: Map[_, _] => MapParameter(pmap.map { case (k: String, v) => (k, primitive2Parameter(v)) })
   }
 
-  implicit def listParameter2ParameterList(mapListP: Map[String, ListParameter]) = mapListP.map { case (k, v) => k -> v.pList }
 }

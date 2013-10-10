@@ -2,22 +2,26 @@ package edu.cmu.lti.oaqa.bagpipes.space
 import SimpleExplorer._
 import edu.cmu.lti.oaqa.bagpipes.space.ConfigurationSpace._
 import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.ExecutableConf
+import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.AtomicExecutableConf
 
 /**
  * SimpleExplorer provides a depth/breadth-first (given by the specified
  * `Ordering`) traversal of all the nodes in a configuration space.
  *
+ * See `BreadthFirstExplorer` and `DepthFirstExplorer` singletons.
+ *
  * @author Avner Maiberg (amaiberg@cs.cmu.edu)
  */
 
-protected sealed class SimpleExplorer(order: Ordering) extends Explorer[ExecutableConf] {
+protected sealed class SimpleExplorer(order: Ordering) extends Explorer[AtomicExecutableConf] {
   /**
    * Returns either a depth-first or breadth-first ordering of the configuration
    * space as specified by `Ordering`.
    *
-   * @oaram initial the initial position, or root in the configuration space
+   * @oaram initial
+   * 			The initial position, or root in the configuration space tree.
    */
-  def from(initial: Tree[ExecutableConf]) = {
+  def from(initial: Tree[AtomicExecutableConf]) = {
     val initialStream = Stream[TreeWithHistory]((initial, Stream()))
     order match {
       case Depth => fromDepth(initialStream) //depth-first
@@ -28,9 +32,10 @@ protected sealed class SimpleExplorer(order: Ordering) extends Explorer[Executab
    * Returns a stream of [[edu.cmu.lti.oaqa.bagpipes.space.TreeWithHistory]] in
    * using depth-first search traversal.
    *
-   * @oaram initial the initial position (or root) in the configuration space tree.
+   * @oaram initial
+   * 			The initial position (or root) in the configuration space tree.
    */
-  private def fromDepth(initial: Stream[TreeWithHistory]): Stream[LeafWithHistory] = initial match {
+  private def fromDepth(initial: Stream[TreeWithHistory]): Stream[ElementWithHistory] = initial match {
     case Stream() => Stream() // no more nodes, terminate
     case current @ (Leaf(element), hist) #:: siblings => current #::: fromDepth(siblings) // leaf encountered, visit current, and go to next sibling  
     case current @ (Node(element, children), hist) #:: siblings => { // node encountered, 
@@ -42,10 +47,11 @@ protected sealed class SimpleExplorer(order: Ordering) extends Explorer[Executab
    * Returns a stream of [[edu.cmu.lti.oaqa.bagpipes.space.TreeWithHistory]] in
    * using breadth-first search traversal.
    *
-   * @oaram initial the initial position (or root) in the configuration space tree.
+   * @oaram initial
+   * 			the initial position (or root) in the configuration space tree.
    */
-  private def fromBreadth(initial: Stream[TreeWithHistory]): Stream[LeafWithHistory] = {
-    def fromBreadth(initial: Stream[TreeWithHistory], childrenAcc: Stream[TreeWithHistory]): Stream[LeafWithHistory] =
+  private def fromBreadth(initial: Stream[TreeWithHistory]): Stream[ElementWithHistory] = {
+    def fromBreadth(initial: Stream[TreeWithHistory], childrenAcc: Stream[TreeWithHistory]): Stream[ElementWithHistory] =
       (initial, childrenAcc) match {
         case (Stream(), Stream()) => Stream() // no more children for breadth-first search, terminate
         case (Stream(), childrenAcc) => fromBreadth(childrenAcc, Stream()) // finished level of breadth-first, move on to next

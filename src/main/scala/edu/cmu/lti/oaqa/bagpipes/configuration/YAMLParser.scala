@@ -16,7 +16,7 @@ import scala.collection.JavaConverters._
 object YAMLParser extends Parser {
 
   /**
-   * Returns a [[scala.collections.Map]] representation of a yaml configuration
+   * Returns a [[scala.collections.Map]] representation of a Yaml configuration
    * descriptor file from the specified file path.
    *
    * Note: implicitly converts [[java.util.Map]] to [[scala.collections.Map]]

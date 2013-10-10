@@ -13,7 +13,7 @@ import SimpleExplorer._
  */
 
 trait Explorer[T] extends HistoryTypes[T] {
-  def from(initial: Tree[T]): Stream[LeafWithHistory]
+  def from(initial: Tree[T]): Stream[ElementWithHistory]
 }
 
 /**
@@ -25,9 +25,10 @@ trait HistoryTypes[T] {
   type TreeWithHistory = (Tree[T], Stream[Leaf[T]])
   type LeafWithHistory = (Leaf[T], Stream[Leaf[T]])
   type NodeWithHistory = (Node[T], Stream[Leaf[T]])
-  implicit def nodeWithHistory2LeafWithHistory[T](node: Stream[TreeWithHistory]): Stream[LeafWithHistory] = node match {
-    case cur @ (Leaf(element), hist) #:: rest => Stream((Leaf(element), hist))
-    case cur @ (Node(element, children), hist) #:: rest => Stream((Leaf(element), hist))
+  type ElementWithHistory = (T, Stream[T])
+  implicit def nodeWithHistory2ElementWithHistory[T](node: Stream[TreeWithHistory]): Stream[ElementWithHistory] = node match {
+    case cur @ (Leaf(element), hist) #:: rest => Stream((element, hist.map(_.elem)))
+    case cur @ (Node(element, children), hist) #:: rest => Stream((element, hist.map(_.elem)))
   }
 }
 

@@ -24,17 +24,32 @@ import edu.cmu.lti.oaqa.bagpipes.configuration.Parameters._
  */
 
 object Descriptors {
-  sealed trait ExecutableConf //extends ExecutableDescriptor with ConfExpr
-  sealed trait Testable //extends ExecutableDescriptor with ConfExpr
 
-  sealed trait ExecutableComponent extends ExecutableConf
-  case class ConfigurationDescriptor(configuration: Configuration, `collection-reader`: ComponentDescriptor, pipeline: List[PhaseDescriptor])
+  trait PipelineDescriptor
+  trait AtomicExecutable
+
+  sealed abstract class AtomicExecutableConf(className: String, params: Map[String, Parameter]) extends ExecutableConf(className, params) with AtomicExecutable
+  sealed abstract class ExecutableConf(className: String, params: Map[String, Parameter]) extends PipelineDescriptor {
+    def getClassName = className
+    def getParams = params
+    //extends ExecutableDescriptor with ConfExpr
+  }
+  /**
+   * Companion object for pattern-matching to distinguish between general
+   * `PipelineDescriptor` and `ExecutableConf`.
+   */
+  object ExecutableConf extends PipelineDescriptor {
+    //To be used for pattern-matching
+    def unapply(execConf: ExecutableConf): Option[(String, Map[String, Parameter])] = Some(execConf.getClassName, execConf.getParams)
+  }
+
+  sealed abstract class ExecutableComponent(className: String, params: Map[String, Parameter]) extends ExecutableConf(className: String, params: Map[String, Parameter])
+  case class ConfigurationDescriptor(configuration: Configuration, `collection-reader`: CollectionReaderDescriptor, pipeline: List[PhaseDescriptor])
   case class Configuration(name: String = "default-config", author: String = "default-author")
-  case class CollectionReaderDescriptor(`class`: String, params: Map[String, Parameter] = Map()) extends /* ParameterizedDescriptor(`class`, params) with*/ ExecutableConf
-  case class PhaseDescriptor(phase: String, options: List[ExecutableConf]) extends ExecutableConf
-  case class ComponentDescriptor(`class`: String, params: Map[String, Parameter] = Map()) extends /*ParameterizedDescriptor(`class`, params) with*/ ExecutableConf
-  case class CrossComponentDescriptor(`class`: String, params: Map[String, Parameter] = Map(), `cross-opts`: Map[String, ListParameter] = Map()) extends /* ParameterizedDescriptor(`class`, params) with*/ ExecutableComponent
-  case class ScoreDescriptor(cost: Double, benefit: Double)
+  case class CollectionReaderDescriptor(`class`: String, params: Map[String, Parameter] = Map()) extends AtomicExecutableConf(`class`, params)
+  case class PhaseDescriptor(phase: String, options: List[ExecutableConf]) extends PipelineDescriptor
+  case class ComponentDescriptor(`class`: String, params: Map[String, Parameter] = Map()) extends AtomicExecutableConf(`class`, params)
+  case class CrossComponentDescriptor(`class`: String, params: Map[String, Parameter] = Map(), `cross-opts`: Map[String, ListParameter] = Map()) extends ExecutableConf(`class`, params)
 }
 /*
 sealed abstract class ParameterizedDescriptor(`class`: String, parmeters: Map[String, Any]) {

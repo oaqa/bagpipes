@@ -1,5 +1,6 @@
 package edu.cmu.lti.oaqa.bagpipes.space
 import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors._
+import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.ExecutableConf._
 import edu.cmu.lti.oaqa.bagpipes.configuration.Parameters.Parameter
 import org.apache.uima.collection.CollectionReader
 import edu.cmu.lti.oaqa.bagpipes.configuration.Parameters._
@@ -74,22 +75,22 @@ object ConfigurationSpace {
      * Iterates over arbitrary list of ExecutableDescriptor, expanding
      * [[$packagePath.PhaseDescriptor]] to its tree representation.
      */
-    def populateTree(execs: List[ExecutableConf]): Stream[Tree[ExecutableConf]] = execs match {
+    def populateTree(execs: List[PipelineDescriptor]): Stream[Tree[ExecutableConf]] = execs match {
       //(1) pipeline is empty, should consider failing on this.
       case Nil => Stream()
       //(2) last element is a phase, expand phase to its list of options as new leaves. 
       //(reached end of pipeline)
       case PhaseDescriptor(_, options) :: Nil => options.toStream.map(Leaf[ExecutableConf](_))
       //(3) last element is a component, return component in a new leaf. (reached end of pipeline)
-      case head :: Nil => Stream(Leaf(head))
-      //(4) element is a phase, expand phase to its list of options, 
-      //recursively populating the rest  of the tree, and setting the resulting 
+      case (head @ ExecutableConf(_, _)) :: Nil => Stream(Leaf(head))
+      //(4) element is a phase, expand phase to its list of options. 
+      //Recursively populate the rest  of the tree, and setting the resulting 
       //tree(s) as the children of each option in the phase
       case PhaseDescriptor(_, options) :: tail => options.toStream.map(Node(_, populateTree(tail)))
-      //(5) element is a component, store standalone component in node, 
-      // recursively populating the rest of the tree setting the resulting 
+      //(5) element is a component, store standalone component in a node. 
+      // Recursively populate the rest of the tree setting the resulting  
       // tree(s) as the children of the node
-      case head :: tail => Stream(Node(head, populateTree(tail)))
+      case (head @ ExecutableConf(_, _)) :: tail => Stream(Node(head, populateTree(tail)))
     }
 
     //begin populating tree by expanding the root node containing the collection-reader.
@@ -136,7 +137,7 @@ object ConfigurationSpace {
       }.toStream
     }
     elem match {
-      case CrossComponentDescriptor(name, params, crossParams) => for (pMap <- crossParamsExpander(crossParams)) yield ComponentDescriptor(name, params ++ pMap)
+      case CrossComponentDescriptor(name, params, crossParams) => for (pMap <- crossParamsExpander[String, Parameter](crossParams.flatMap { case (k, v) => Map(k -> v.pList) })) yield ComponentDescriptor(name, params ++ pMap)
       case other => Stream(other)
     }
   }

@@ -38,8 +38,8 @@ pipeline:
 
   trait progConfigs {
     //Collection reader
-    val collectionReaderParams = Map("Language" -> StringParameter("en"), "BrowseSubdirectories" -> BooleanParameter(false), "Encoding" -> StringParameter("UTF-8"))
-    val collectionReader = ComponentDescriptor("org.apache.uima.examples.cpe.FileSystemCollectionReader", collectionReaderParams)
+    val collectionReaderParams = Map("InputDirectory" -> StringParameter("src/test/resources/data/") ,"Language" -> StringParameter("en"), "BrowseSubdirectories" -> BooleanParameter(false), "Encoding" -> StringParameter("UTF-8"))
+    val collectionReader = CollectionReaderDescriptor("uima.components.collection.FileSystemCollectionReader", collectionReaderParams)
 
     val config = Configuration("oaqa-tutorial", "oaqa")
 
@@ -49,7 +49,7 @@ pipeline:
       "opt1" -> ListParameter(List(StringParameter("a"), StringParameter("b"), StringParameter("c"))),
       "opt2" -> ListParameter(List(IntegerParameter(1), IntegerParameter(2))))
     val locations = List("Watson - Yorktown", "Watson - Hawthorne I", "Watson - Hawthorne II")
-    val patterns = Map("numbered" -> "\\b[0-4]\\d[0-2]\\d\\d\\b")
+    val patterns = List("\\b[0-4]\\d[0-2]\\d\\d\\b")
 
     val roomannotator2Params = Map[String, Parameter]("Locations" -> locations, "Patterns" -> patterns)
 
@@ -87,8 +87,8 @@ pipeline:
   }
   //convenience methods:
   // get file path from common classpath of the uima tutorial example directory
-  private val classPath = "org.apache.uima.tutorial"
-  private def getPath(exNum: Int, name: String) = classPath + ".ex%d.%s" format (exNum, name)
+  private val baseClassPath = "uima.components.examples"
+  private def getPath(exNum: Int, name: String) = baseClassPath + ".ex%d.%s" format (exNum, name)
 
   //cross-opts
   // convenience method for generating the cross opt from a list of Tuple2[String,List[_] for Testing purposes.
