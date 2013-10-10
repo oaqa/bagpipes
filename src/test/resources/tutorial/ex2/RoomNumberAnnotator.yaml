@@ -1,6 +1,5 @@
-class: org.apache.uima.tutorial.ex2.RoomNumberAnnotator
+class: uima.components.examples.ex2.RoomNumberAnnotator
 params:
   Locations: ["Watson - Yorktown", "Watson - Hawthorne I", "Watson - Hawthorne II"]
-  Patterns: {numbered: "\\b[0-4]\\d[0-2]\\d\\d\\b"}
-  #persistence-provider: 
-#  inherit: ecd.default-log-persistence-provider
+  Patterns: ["\\b[0-4]\\d[0-2]\\d\\d\\b"]
+  

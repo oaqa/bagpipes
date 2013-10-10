@@ -1,5 +1,6 @@
-class: org.apache.uima.examples.cpe.FileSystemCollectionReader
+class: uima.components.collection.FileSystemCollectionReader
 params:
+	InputDirectory: src/test/resources/data/
     Language: en
     BrowseSubdirectories: FALSE
     Encoding: UTF-8 

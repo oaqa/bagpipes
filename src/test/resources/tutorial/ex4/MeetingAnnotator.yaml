@@ -1,2 +1,2 @@
-class: org.apache.uima.tutorial.ex4.MeetingAnnotator
+class: uima.components.examples.ex4.MeetingAnnotator
 WindowSize: 200

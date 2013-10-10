@@ -1,4 +1,4 @@
-class: org.apache.uima.tutorial.ex1.RoomNumberAnnotator
+class: uima.components.examples.ex1.RoomNumberAnnotator
 
 params:
   test: param1
