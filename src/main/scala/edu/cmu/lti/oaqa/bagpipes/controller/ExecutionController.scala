@@ -1,7 +1,6 @@
 package edu.cmu.lti.oaqa.bagpipes.controller
 import edu.cmu.lti.oaqa.bagpipes.space.Explorer
 import edu.cmu.lti.oaqa.bagpipes.executor.Executor
-import edu.cmu.lti.oaqa.bagpipes.executor.DataCache
 import edu.cmu.lti.oaqa.bagpipes.executor.ExecutableComponent
 import edu.cmu.lti.oaqa.bagpipes.executor.ExecutorTypes
 import edu.cmu.lti.oaqa.bagpipes.executor._
