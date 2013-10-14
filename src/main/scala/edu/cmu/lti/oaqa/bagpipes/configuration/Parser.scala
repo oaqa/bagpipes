@@ -186,7 +186,8 @@ trait Parser {
   }
 
   def extractComponent(confMap: Map[String, Any]) =
-    if (confMap.contains("cross-opts"))
+    if (confMap.contains("collectionClass")) extract[CollectionReaderDescriptor](confMap)
+    else if (confMap.contains("cross-opts"))
       extract[CrossComponentDescriptor](confMap)
     else if (confMap.contains("params")) extract[ComponentDescriptor](confMap)
     else confMap

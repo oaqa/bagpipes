@@ -25,7 +25,6 @@ pipeline:
      - inherit: tutorial.ex3.TutorialDateTime"""
     val ex3 = ex1 + exPhase2
     val ex4 = ex2 + exPhase2
-
     val ex5 = ex0 + """
 pipeline:
   inherit: tutorial.ex1.RoomNumberAnnotator"""
@@ -38,7 +37,7 @@ pipeline:
 
   trait progConfigs {
     //Collection reader
-    val collectionReaderParams = Map("InputDirectory" -> StringParameter("src/test/resources/data/") ,"Language" -> StringParameter("en"), "BrowseSubdirectories" -> BooleanParameter(false), "Encoding" -> StringParameter("UTF-8"))
+    val collectionReaderParams = Map("InputDirectory" -> StringParameter("src/test/resources/data/"), "Language" -> StringParameter("en"), "BrowseSubdirectories" -> BooleanParameter(false), "Encoding" -> StringParameter("UTF-8"))
     val collectionReader = CollectionReaderDescriptor("uima.components.collection.FileSystemCollectionReader", collectionReaderParams)
 
     val config = Configuration("oaqa-tutorial", "oaqa")
