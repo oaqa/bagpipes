@@ -1,4 +1,4 @@
-collectionClass: uima.components.collection.FileSystemCollectionReader
+collection-class: uima.components.collection.FileSystemCollectionReader
 params:
     InputDirectory: src/test/resources/data/
     Language: en
