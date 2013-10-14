@@ -1,12 +1,15 @@
 package edu.cmu.lti.oaqa.bagpipes.executor
-
-import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.ComponentDescriptor
-import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.CollectionReaderDescriptor
-import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.ExecutableConf
 import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.AtomicExecutable
-import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.AtomicExecutableConf
+import scala.collection.immutable.Stream.consWrapper
 
 /**
+ * A generic strategist that does all the high-level "bookkeeping"
+ * for execution pipelines (i.e., keeping track of the trace (and subtraces),
+ * updating the result and component cache, executing annotators, and storing
+ * their results).`I` is the type for which the set of all executions
+ * are "closed under". `C` is a either a Reader or Annotator that may be readily
+ * executed.
+ *
  * @param I
  * 		Data exchange type
  * @param C
@@ -19,6 +22,19 @@ trait Executor[I, C <: ExecutableComponent[I]] extends ExecutorTypes[I, C] {
   protected def getFirstInput: I
   final def getEmptyCache = Cache(Map(Trace(0, Stream()) -> getFirstInput), Map())
 
+  /**
+   * Use a component C, to process an input I, specified by the trace.
+   *
+   * If the trace, component, and its parameters have not been used before to
+   * instantiate, then a new one will be created; otherwise, the
+   * existing one will be used.  If a new component is created, it will be
+   * cached for later re-use.
+   *
+   * @param execDesc
+   * 	A descriptor containing the classname and parameters for some analysis engine
+   * @param trace
+   * 	The process trace of components associated with the next input
+   */
   //def execute(execDesc: ExecutableConf, trace: Trace) = ???
   final def execute(execDesc: AtomicExecutable, trace: Trace)(implicit cache: Cache): Result = {
     val newTrace: Trace = trace ++ execDesc // update trace
@@ -35,28 +51,5 @@ trait Executor[I, C <: ExecutableComponent[I]] extends ExecutorTypes[I, C] {
   def reset(cls: String, params: List[(String, Any)]): Boolean
 }
 
-protected abstract trait ComponentFactory[I, C <: ExecutableComponent[I]] {
-  def create(execDesc: AtomicExecutable): C = execDesc match {
-    case collDesc @ CollectionReaderDescriptor(_, _) => createReader(collDesc)
-    case compDesc @ ComponentDescriptor(_, _) => createAnnotator(compDesc)
-  }
-  def createReader(readerDesc: CollectionReaderDescriptor): Reader[I] with C
-  def createAnnotator(componentDesc: ComponentDescriptor): Annotator[I] with C
-}
 
-trait ExecutorTypes[I, C <: ExecutableComponent[I]] {
-  case class Trace(inputNum: Int, componentTrace: Stream[AtomicExecutable]) {
-    def ++(execDesc: AtomicExecutable): Trace = Trace(inputNum, componentTrace #::: Stream(execDesc))
-    override def toString: String = "Input #: " + inputNum + "\nTrace: " + componentTrace
-  }
 
-  type ComponentCache = Map[Trace, C]
-  type DataCache = Map[Trace, I]
-  type Result = (I, Cache)
-
-  case class Cache(dataCache: DataCache, componentCache: ComponentCache)
-
-  def updateCache(newInput: I, newComponent: C, trace: Trace)(implicit cache: Cache) = cache match {
-    case Cache(dataCache, compCache) => Cache(dataCache ++ Map(trace -> newInput), compCache ++ Map(trace -> newComponent))
-  }
-}

@@ -4,6 +4,16 @@ import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.CollectionReaderDescr
 import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.ComponentDescriptor
 
 trait SimpleComponent extends ExecutableComponent[String]
+/**
+ * Simple example of how to implement an Executor. This executor simply append 
+ * the latest component descriptor to the subtrace. Thus, running any component
+ * returns the "root-to-node" path of that component in the explored configuration
+ * space. This class is also intended for designing simple unit-tests.
+ * 
+ * 
+ * @author Avner Maiberg (amaiberg@cs.cmu.edu)
+ */
+
 object SimpleExecutor extends Executor[String, SimpleComponent] {
   override val componentFactory = SimpleComponentFactory
   //need to rethink reset

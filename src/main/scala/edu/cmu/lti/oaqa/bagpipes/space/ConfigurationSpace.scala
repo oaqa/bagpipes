@@ -102,7 +102,8 @@ object ConfigurationSpace {
   type NodeExpander = ExecutableConf => Stream[ExecutableConf]
 
   /**
-   * Applies a [[NodeExpander]] to each of the nodes in the configuration space and returns the resulting tree.
+   * Applies a [[NodeExpander]] to each of the nodes in the configuration space
+   * and returns the resulting tree.
    *
    * @param expand the [[NodeExpander]] to be applied to the nodes.
    * @return the expanded space.

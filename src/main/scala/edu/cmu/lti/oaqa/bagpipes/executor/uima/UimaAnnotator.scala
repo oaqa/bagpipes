@@ -12,10 +12,9 @@ import org.apache.uima.analysis_component.AnalysisComponent
 /**
  * Instantiate and use any UIMA AnalysisEngine in a pipeline.
  *
- * @param cls
- * 		The class of the UIMA AnalysisEngine to use
- * @param params
- * 		The parameters for the UIMA AnalysisEngine
+ * @param compDesc
+ * 		A ComponentDescriptor with the class and parameters of the UIMA
+ *      AnalysisEngine to use.
  * @author Collin McCormack, and Avner Maiberg
  */
 final class UimaAnnotator(compDesc: ComponentDescriptor) extends UimaComponent(compDesc) with Annotator[JCas] {
