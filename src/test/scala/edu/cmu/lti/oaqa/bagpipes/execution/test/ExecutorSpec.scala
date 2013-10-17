@@ -23,7 +23,7 @@ class ExecutorSpec extends FeatureSpec {
     new confTrees {
       val controller = SimpleDepthExecutionController
       scenario("executing confTree4") {
-  //      controller.execute(confTree4)
+        controller.execute(confTree4)
       }
     }
   }
@@ -32,7 +32,7 @@ class ExecutorSpec extends FeatureSpec {
     new confTrees {
       val controller = SimpleBreadthExecutionController
       scenario("executing confTree4") {
- //       controller.execute(confTree4)
+        controller.execute(confTree4)
       }
     }
   }
@@ -41,7 +41,7 @@ class ExecutorSpec extends FeatureSpec {
     new confTrees {
       val controller = SimpleUimaExecutionController
       scenario("executing confTree4") {
-    	  controller.execute(confTree4)
+        controller.execute(confTree4)
       }
     }
   }

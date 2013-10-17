@@ -8,13 +8,17 @@ trait ExecutorTypes[I, C <: ExecutableComponent[I]] {
     override def toString: String = "Input #: " + inputNum + "\nTrace: " + componentTrace.toList
   }
 
-  type ComponentCache = Map[Trace, C]
+  type ComponentCache = Map[Stream[AtomicExecutable], C]
   type DataCache = Map[Trace, I]
   type Result = (I, Cache)
 
-  case class Cache(dataCache: DataCache, componentCache: ComponentCache)
+  case class Cache(dataCache: DataCache, componentCache: ComponentCache) {
+    def ++(cache: Cache) = this match {
+      case Cache(d, c) => Cache(d ++ cache.dataCache, c ++ cache.componentCache)
+    }
+  }
 
   def updateCache(newInput: I, newComponent: C, trace: Trace)(implicit cache: Cache) = cache match {
-    case Cache(dataCache, compCache) => Cache(dataCache ++ Map(trace -> newInput), compCache ++ Map(trace -> newComponent))
+    case Cache(dataCache, compCache) => Cache(dataCache ++ Map(trace -> newInput), compCache ++ Map(trace.componentTrace -> newComponent))
   }
 }

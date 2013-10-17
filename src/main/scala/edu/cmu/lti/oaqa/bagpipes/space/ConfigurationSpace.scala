@@ -43,9 +43,10 @@ class ConfigurationSpace(confDes: ConfigurationDescriptor) {
   import ConfigurationSpace._
   val confSpace = populateTree(confDes)
   val defaultExpanders: List[NodeExpander] = crossOptsExpander _ :: Nil
+  lazy val space = defaultExpanders.foldLeft(confSpace)((space, expander) => expandNodes(expander, space))
+
   def getSpace = space
   /*apply all the defaultExpanders to the tree and return the resulting configuration space*/
-  lazy val space = defaultExpanders.foldLeft(confSpace)((space, expander) => expandNodes(expander, space))
 }
 
 object ConfigurationSpace {
@@ -55,10 +56,22 @@ object ConfigurationSpace {
   /**
    * n-ary tree to store the configuration space.
    */
-  sealed abstract class Tree[T](elem: T) { def getElem = elem }
-  case class Node[T](elem: T, children: Stream[Tree[T]] = Stream()) extends Tree[T](elem)
-  case class Leaf[T](elem: T) extends Tree[T](elem)
 
+  //top-level class for all nodes
+  sealed abstract class Tree[T](elem: T) { def getElem = elem }
+  //top-level class for nodes containing children
+  sealed abstract class TreeWithChildren[T](elem: T, children: Stream[Tree[T]]) extends Tree(elem) {
+    def getChildren = children
+  }
+  //used for pattern-matching
+  object TreeWithChildren {
+    def unapply[T](tree: TreeWithChildren[T]): Option[(T, Stream[Tree[T]])] = Some(tree.getElem, tree.getChildren)
+  }
+  //sealed abstract class NodeWithChildren[E, T](elem: E, children: Stream[T]) extends Tree[E](elem)
+  case class Node[T](elem: T, children: Stream[Tree[T]] = Stream()) extends TreeWithChildren[T](elem, children)
+  case class Leaf[T](elem: T) extends Tree[T](elem)
+  //Entry-point to the tree that also contains a special element
+  case class Root[R <: T, T](root: R, trees: Stream[Tree[T]] = Stream()) extends TreeWithChildren[T](root, trees)
   /**
    *  Returns a new [[$packagePath.ConfigurationSpace.Tree]] describing all possible
    *  execution paths given by a [[$packaPath.ConfigurationDescripor]].
@@ -66,7 +79,7 @@ object ConfigurationSpace {
    *    The configuration descriptor describing the `ConfigurationSpace`.
    *
    */
-  private def populateTree(confDes: ConfigurationDescriptor): Tree[ExecutableConf] = {
+  private def populateTree(confDes: ConfigurationDescriptor): Root[CollectionReaderDescriptor, ExecutableConf] = {
     /**
      * INNER FUNCTION:
      * Returns the children of the root node (expanding the entire discrete version
@@ -95,7 +108,7 @@ object ConfigurationSpace {
 
     //begin populating tree by expanding the root node containing the collection-reader.
     confDes match {
-      case ConfigurationDescriptor(_, collectionReader, pipeline) => Node[ExecutableConf](collectionReader, populateTree(pipeline))
+      case ConfigurationDescriptor(_, collectionReader, pipeline) => Root[CollectionReaderDescriptor, ExecutableConf](collectionReader, populateTree(pipeline))
     }
   }
 
@@ -108,19 +121,20 @@ object ConfigurationSpace {
    * @param expand the [[NodeExpander]] to be applied to the nodes.
    * @return the expanded space.
    */
-  def expandNodes(expand: NodeExpander, confSpace: Tree[ExecutableConf]): Tree[ExecutableConf] = {
+  def expandNodes(expand: NodeExpander, confSpace: Root[CollectionReaderDescriptor, ExecutableConf]): Root[CollectionReaderDescriptor, ExecutableConf] = {
     /*since expand returns a list of components, wrap the component in a leaf or a node*/
     def expandNode(expand: NodeExpander, tree: Tree[ExecutableConf]) = tree match {
       case Leaf(elem) => expand(elem).map(Leaf(_))
-      case Node(elem, children) => expand(elem).map(Node(_, children))
+      case TreeWithChildren(elem, children) => expand(elem).map(Node(_, children))
     }
 
     /*perform a depth-first traversal of the tree applying expand to all of the nodes*/
     def expandNodes(expand: NodeExpander, confSpace: Tree[ExecutableConf]): Tree[ExecutableConf] = confSpace match {
       case Leaf(elem) => Leaf(elem)
-      case Node(elem, children) => Node(elem, children.flatMap(expandNode(expand, _)).map(expandNodes(expand, _)))
+      case TreeWithChildren(elem, children) => Node(elem, children.flatMap(expandNode(expand, _)).map(expandNodes(expand, _)))
     }
-    expandNodes(expand, confSpace)
+    
+    Root(confSpace.root, confSpace.trees.flatMap(expandNode(expand, _)).map(expandNodes(expand, _)))
   }
 
   /**

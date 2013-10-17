@@ -20,8 +20,8 @@ trait Executor[I, C <: ExecutableComponent[I]] extends ExecutorTypes[I, C] {
   protected val componentFactory: ComponentFactory[I, C]
 
   protected def getFirstInput: I
-  final def getEmptyCache = Cache(Map(Trace(0, Stream()) -> getFirstInput), Map())
-
+  final def getEmptyCache(input:Int) = Cache(Map(Trace(input, Stream()) -> getFirstInput), Map())
+  final def getComponentFactory = componentFactory
   /**
    * Use a component C, to process an input I, specified by the trace.
    *
@@ -38,8 +38,8 @@ trait Executor[I, C <: ExecutableComponent[I]] extends ExecutorTypes[I, C] {
   //def execute(execDesc: ExecutableConf, trace: Trace) = ???
   final def execute(execDesc: AtomicExecutable, trace: Trace)(implicit cache: Cache): Result = {
     val newTrace: Trace = trace ++ execDesc // update trace
-    val component: C = if (cache.componentCache.contains(newTrace))
-      cache.componentCache(newTrace) // get cached component
+    val component: C = if (cache.componentCache.contains(newTrace.componentTrace))
+      cache.componentCache(newTrace.componentTrace) // get cached component
     else
       componentFactory.create(execDesc) // create new component from factory TODO: put this in factory
     val prevExecResult: I = cache.dataCache(trace) //get previous result up to current sub-trace

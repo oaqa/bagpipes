@@ -4,39 +4,41 @@ import edu.cmu.lti.oaqa.bagpipes.space.ConfigurationSpace._
 import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors._
 package test {
   trait confTrees extends progConfigs {
+
+    type ExecutableTree = Tree[AtomicExecutableConf]
     //tree1 
-    val confTree0: Tree[AtomicExecutableConf] = Node(collectionReader)
+    val confTree0 = Root[CollectionReaderDescriptor, AtomicExecutableConf](collectionReader)
     //tree2
-    val confTree1 = Node[AtomicExecutableConf](collectionReader,
-      Stream( //children
+    val confTree1 = Root(collectionReader,
+      Stream[ExecutableTree]( //children
         Leaf(roomAnnotator1)))
     //tree3
-    val confTree2 = Node[AtomicExecutableConf](collectionReader,
-      Stream( //children
+    val confTree2 = Root(collectionReader,
+      Stream[ExecutableTree]( //children
         Leaf(roomAnnotator1), Leaf(roomAnnotator2)))
 
     //tree3
-    val confTree3 = Node[AtomicExecutableConf](collectionReader,
+    val confTree3 = Root(collectionReader,
       Stream( //children
         Node(roomAnnotator1,
-          Stream( // children
+          Stream[ExecutableTree]( // children
             Leaf(simpleDateTimeAnnotator), Leaf(dateTimeAnnotator)))))
 
-    val confTree4 = Node[AtomicExecutableConf](collectionReader,
-      Stream( //children
+    val confTree4 = Root(collectionReader,
+      Stream[ExecutableTree]( //children
         Node(roomAnnotator1,
-          Stream( // children
+          Stream[ExecutableTree]( // children
             Leaf(simpleDateTimeAnnotator), Leaf(dateTimeAnnotator))),
         Node(roomAnnotator2,
-          Stream( // children
+          Stream[ExecutableTree]( // children
             Leaf(simpleDateTimeAnnotator), Leaf(dateTimeAnnotator)))))
 
     //tree 5: (cross-opt, expanded)        
-    val confTree5 = Node[AtomicExecutableConf](collectionReader,
+    val confTree5 = Root(collectionReader,
       expandedCrossOptAnnotators1.toStream.map((c: AtomicExecutableConf) => Leaf(c)))
 
     //tree 6: cross-opts (expanded)
-    val confTree6 = Node[AtomicExecutableConf](collectionReader,
+    val confTree6 = Root(collectionReader,
       expandedCrossOptAnnotators1.toStream.map((c: AtomicExecutableConf) => Leaf(c)))
   }
 

@@ -13,7 +13,7 @@ import org.apache.uima.util.CasCopier
  * @param readerDesc
  * 		A CollectionReaderDescriptor containing the classpath and parameters for
  *      the CollectionReader.
- * @author Collin McCormack, and Avner Maiberg
+ * @author Collin McCormack, and Avner Maiberg (amaiberg@cs.cmu.edu)
  */
 final class UimaReader(readerDesc: CollectionReaderDescriptor) extends UimaComponent(readerDesc) with Reader[JCas] {
   //import UimaComponent.flattenParams
@@ -23,6 +23,9 @@ final class UimaReader(readerDesc: CollectionReaderDescriptor) extends UimaCompo
   val collReaderClass = createReaderClass(className)
   println("params: " + params)
   val collReader = CollectionReaderFactory.createReader(collReaderClass, typeSysDesc, params: _*)
+  lazy val total: Int = collReader.getProgress().head.getTotal().toInt
+
+  override def getTotalInputs(): Int = total
 
   /**
    * Try to put the next input item into the JCas
@@ -31,8 +34,11 @@ final class UimaReader(readerDesc: CollectionReaderDescriptor) extends UimaCompo
    * 	The JCas to populate with the next input item
    * @return true if there was another item use, false otherwise
    */
-  override def executeComponent(input: JCas): Unit =  collReader.getNext(input.getCas())
-  
+  override def executeComponent(input: JCas): Unit = collReader.getNext(input.getCas())
+
+  //override def getNext(emptyInput: JCas) = collReader.getNext(emptyInput.getCas)
+
+  //override def hasNext() = collReader.hasNext()
 
   /**
    * Close and release the resources for the CollectionReader.
