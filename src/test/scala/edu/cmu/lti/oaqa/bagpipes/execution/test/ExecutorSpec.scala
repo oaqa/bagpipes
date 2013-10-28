@@ -1,10 +1,11 @@
 package edu.cmu.lti.oaqa.bagpipes.execution.test
-import edu.cmu.lti.oaqa.bagpipes.space.Explorer
+import edu.cmu.lti.oaqa.bagpipes.space.explorer.Explorer
 import edu.cmu.lti.oaqa.bagpipes.executor.Executor
 import edu.cmu.lti.oaqa.bagpipes.executor.ExecutableComponent
 import edu.cmu.lti.oaqa.bagpipes.executor.ExecutorTypes
 import edu.cmu.lti.oaqa.bagpipes.executor._
 import edu.cmu.lti.oaqa.bagpipes.space._
+import edu.cmu.lti.oaqa.bagpipes.space.explorer.SimpleExplorer._
 import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.ConfigurationDescriptor
 import edu.cmu.lti.oaqa.bagpipes.space.ConfigurationSpace
 import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.ExecutableConf
@@ -16,6 +17,8 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.FeatureSpec
 import edu.cmu.lti.oaqa.bagpipes.controller.ExecutionController
 import edu.cmu.lti.oaqa.bagpipes.executor.uima.UimaExecutor
+import edu.cmu.lti.oaqa.bagpipes.space.explorer.DepthExplorer
+import edu.cmu.lti.oaqa.bagpipes.space.explorer.BreadthExplorer
 
 @RunWith(classOf[JUnitRunner])
 class ExecutorSpec extends FeatureSpec {
@@ -39,6 +42,7 @@ class ExecutorSpec extends FeatureSpec {
 
   feature("Uima depth-first explorer") {
     new confTrees {
+      val executor = SimpleExecutor
       val controller = SimpleUimaExecutionController
       scenario("executing confTree4") {
         controller.execute(confTree4)

@@ -1,14 +1,11 @@
 package edu.cmu.lti.oaqa.bagpipes.executor
 
 import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.AtomicExecutable
+import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.AtomicExecutableConf
 
-trait ExecutorTypes[I, C <: ExecutableComponent[I]] {
-  case class Trace(inputNum: Int, componentTrace: Stream[AtomicExecutable]) {
-    def ++(execDesc: AtomicExecutable): Trace = Trace(inputNum, componentTrace #::: Stream(execDesc))
-    override def toString: String = "Input #: " + inputNum + "\nTrace: " + componentTrace.toList
-  }
+trait ExecutorTypes[I, C <: ExecutableComponent[I]]  {
 
-  type ComponentCache = Map[Stream[AtomicExecutable], C]
+  type ComponentCache = Map[Stream[AtomicExecutableConf], C]
   type DataCache = Map[Trace, I]
   type Result = (I, Cache)
 

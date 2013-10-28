@@ -1,14 +1,14 @@
 package edu.cmu.lti.oaqa.bagpipes.executor
 import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.AtomicExecutable
 import scala.collection.immutable.Stream.consWrapper
+import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.AtomicExecutableConf
 
 /**
  * A generic strategist that does all the high-level "bookkeeping"
  * for execution pipelines (i.e., keeping track of the trace (and subtraces),
  * updating the result and component cache, executing annotators, and storing
- * their results).`I` is the type for which the set of all executions
- * are "closed under". `C` is a either a Reader or Annotator that may be readily
- * executed.
+ * their results). The set of all executions are closed under the type `I`. `C`
+ * is a either a Reader or Annotator that may be readily executed.
  *
  * @param I
  * 		Data exchange type
@@ -20,7 +20,7 @@ trait Executor[I, C <: ExecutableComponent[I]] extends ExecutorTypes[I, C] {
   protected val componentFactory: ComponentFactory[I, C]
 
   protected def getFirstInput: I
-  final def getEmptyCache(input:Int) = Cache(Map(Trace(input, Stream()) -> getFirstInput), Map())
+  final def getEmptyCache(input: Int) = Cache(Map(Trace(input, Stream()) -> getFirstInput), Map())
   final def getComponentFactory = componentFactory
   /**
    * Use a component C, to process an input I, specified by the trace.
@@ -36,7 +36,7 @@ trait Executor[I, C <: ExecutableComponent[I]] extends ExecutorTypes[I, C] {
    * 	The process trace of components associated with the next input
    */
   //def execute(execDesc: ExecutableConf, trace: Trace) = ???
-  final def execute(execDesc: AtomicExecutable, trace: Trace)(implicit cache: Cache): Result = {
+  final def execute(execDesc: AtomicExecutableConf, trace: Trace)(implicit cache: Cache): Result = {
     val newTrace: Trace = trace ++ execDesc // update trace
     val component: C = if (cache.componentCache.contains(newTrace.componentTrace))
       cache.componentCache(newTrace.componentTrace) // get cached component
