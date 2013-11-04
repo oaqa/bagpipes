@@ -6,5 +6,5 @@ import edu.cmu.lti.oaqa.bagpipes.executor.uima.UimaComponent
 import edu.cmu.lti.oaqa.bagpipes.executor.Trace
 
 class UimaScorer extends Scorer[JCas] {
-  override def score(trace: Trace) = 1
+  override def score(trace: Trace, result: Option[JCas]) = 1
 }

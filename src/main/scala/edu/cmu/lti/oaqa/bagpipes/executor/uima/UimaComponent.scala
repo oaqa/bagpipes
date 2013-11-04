@@ -12,6 +12,7 @@ import java.util.Arrays
 import java.util.HashMap
 import edu.cmu.lti.oaqa.bagpipes.configuration.Parameters.ListParameter
 import edu.cmu.lti.oaqa.bagpipes.configuration.Parameters.MapParameter
+import edu.cmu.lti.oaqa.bagpipes.configuration.Parameters.DoubleParameter
 abstract class UimaComponent(execDesc: ExecutableConf) extends ExecutableComponent[JCas] {
   protected final val typeSysDesc = getTypeSystem()
   protected final val className = execDesc.getClassName
@@ -38,7 +39,7 @@ object UimaComponent {
    * @return TypeSystemDescription for the pipeline
    */
   def getTypeSystem() = {
-    System.setProperty("org.uimafit.type.import_pattern", "classpath*:types/*.xml")
+    System.setProperty("org.uimafit.type.import_pattern", "classpath*:TypeSystemDescriptor.xml"); // "classpath*:types/*.xml")
     TypeSystemDescriptionFactory.createTypeSystemDescription()
   }
 
@@ -57,8 +58,12 @@ object UimaComponent {
     case ListParameter(pList) => Arrays.asList(pList.map(_.getElem): _*)
     case MapParameter(pMap) =>
       new HashMap[String, Object]() {
-        pMap.foreach { case (k: String, v) => put(k, v.getElem.asInstanceOf[Object]) }
+        pMap.foreach {
+          case (k: String, v) => put(k, scala2JavaType(v))
+        }
       }
+    //important to convert doubles to floats for uima components!
+    case DoubleParameter(v) => v.toFloat.asInstanceOf[Object]
     case o => o.getElem.asInstanceOf[Object]
   }
 }

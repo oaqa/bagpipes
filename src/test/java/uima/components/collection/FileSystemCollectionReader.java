@@ -20,13 +20,7 @@
 package uima.components.collection;
 
 import java.io.File;
-import java.io.InputStream;
-
-import util.StreamUtil;
-import util.StreamUtil.*;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import org.apache.uima.UimaContext;
 import org.apache.uima.collection.CollectionException;

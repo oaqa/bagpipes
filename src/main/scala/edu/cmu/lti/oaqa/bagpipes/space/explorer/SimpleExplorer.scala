@@ -25,7 +25,7 @@ protected class SimpleExplorer[R <: T, T, I](order: Ordering) extends Explorer[R
    * 			The initial position, or root in the configuration space tree.
    */
 
-  override def from(initial: Stream[ExecutableTree])(implicit input: Int): Stream[ExecutableTree] = order match {
+  override def from(initial: Stream[ExecutableTree])(implicit input: I): Stream[ExecutableTree] = order match {
     case Depth => fromDepth(initial) //depth-first
     case Breadth => fromBreadth(initial) //breadth-first
   }

@@ -20,10 +20,11 @@ import edu.cmu.lti.oaqa.bagpipes.executor.Trace
 /**
  *
  *
- * @autho Avner Maiberg (amaiberg@cs.cmu.edu)
+ * @author Avner Maiberg (amaiberg@cs.cmu.edu)
  */
 
 class ExecutionController[I, C <: ExecutableComponent[I]](explr: Explorer[CollectionReaderDescriptor, AtomicExecutableConf, Int], exctr: Executor[I, _ <: ExecutableComponent[I]])(implicit scorer: Scorer[I] = DefaultScorer[I]) {
+  import ExecutionController._
   //TODO: currently initializing collection reader twice: once in execute and again
   //when instantiating the root in the stream. Find some better way of doing this,
   //maybe by storing the first one in the cache.
@@ -56,10 +57,27 @@ class ExecutionController[I, C <: ExecutableComponent[I]](explr: Explorer[Collec
           //  println("resulting cache: " + updatedCache)
           //maybe do something with result here
           //explr.from(rest)
-          execStream(explr.from(rest)(input), input)(updatedCache)
+          execStream(nonRepeating(explr.from(rest)(input)), input)(updatedCache)
         }
       }
     execStream(confSpaceStream, totalInputs - 1)
+  }
+}
+
+object ExecutionController {
+  def apply[I](explr: Explorer[CollectionReaderDescriptor, AtomicExecutableConf, Int], exctr: Executor[I, _ <: ExecutableComponent[I]])(implicit scorer: Scorer[I] = DefaultScorer[I]) =
+    new ExecutionController(explr, exctr)
+
+  def nonRepeating[T](strm: Stream[T]): Stream[T] = {
+    def nonRepeating[T](strm: Stream[T], acc: Set[T]): Stream[T] = strm match {
+      case Stream() => Stream()
+      case cur #:: next =>
+        if (!acc.contains(cur))
+          cur #:: nonRepeating(next, acc ++ Set(cur))
+        else
+          nonRepeating(next, acc)
+    }
+    nonRepeating(strm, Set())
   }
 }
 

@@ -1,0 +1,9 @@
+configuration:
+    name: oaqa-test
+    author: oaqa 
+collection-reader:
+    inherit: collection_reader.filesystem-collection-reader
+pipeline:
+    - phase: RoomNumberAnnotators
+      options: 
+        - inherit: tutorial.ex1.RoomNumberAnnotator

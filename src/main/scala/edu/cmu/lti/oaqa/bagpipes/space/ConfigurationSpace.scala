@@ -4,6 +4,7 @@ import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.ExecutableConf._
 import edu.cmu.lti.oaqa.bagpipes.configuration.Parameters.Parameter
 import org.apache.uima.collection.CollectionReader
 import edu.cmu.lti.oaqa.bagpipes.configuration.Parameters._
+import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.AtomicExecutableConf
 
 /**
  * Provides mapping between configuration descriptor to configuration space.
@@ -12,7 +13,7 @@ import edu.cmu.lti.oaqa.bagpipes.configuration.Parameters._
  * The following configuration descriptor,
  * {{{
  * (<-----------------ConfigurationDescriptor----------------->)
- *                    (<------Phases----->)
+ *                    (<------Phases----->) 
  * collection-reader   p_0     p_1     p_2     standalone
  * -----------------  ------  ------  ------  -----------
  * 		                      c_1_0
@@ -59,7 +60,7 @@ object ConfigurationSpace {
    *    The configuration descriptor describing the `ConfigurationSpace`.
    *
    */
-  private def populateTree(confDes: ConfigurationDescriptor): Root[CollectionReaderDescriptor, ExecutableConf] = {
+  private def populateTree(confDes: ConfigurationDescriptor): Root[CollectionReaderDescriptor, AtomicExecutableConf] = {
     /**
      * INNER FUNCTION:
      * Returns the children of the root node (expanding the entire discrete version
@@ -68,14 +69,14 @@ object ConfigurationSpace {
      * Iterates over arbitrary list of ExecutableDescriptor, expanding
      * [[$packagePath.PhaseDescriptor]] to its tree representation.
      */
-    def populateTree(execs: List[PipelineDescriptor], hist: Stream[ExecutableConf] = Stream()): Stream[TreeWithHistory[ExecutableConf] with Child] = execs match {
+    def populateTree(execs: List[PipelineDescriptor], hist: Stream[AtomicExecutableConf] = Stream()): Stream[TreeWithHistory[AtomicExecutableConf] with Child] = execs match {
       //(1) pipeline is empty, should consider failing on this.
       case Nil => Stream()
       //(2) last element is a phase, expand phase to its list of options as new leaves. 
       //(reached end of pipeline)
-      case PhaseDescriptor(_, options) :: Nil => options.toStream.map(Leaf[ExecutableConf](_, hist))
+      case PhaseDescriptor(_, options) :: Nil => options.toStream.map(Leaf[AtomicExecutableConf](_, hist))
       //(3) last element is a component, return component in a new leaf. (reached end of pipeline)
-      case (head @ ExecutableConf(_, _)) :: Nil => Stream(Leaf(head, hist))
+      case (head @ AtomicExecutableConf(_, _)) :: Nil => Stream(Leaf(head, hist))
       //(4) element is a phase, expand phase to its list of options. 
       //Recursively populate the rest  of the tree, and setting the resulting 
       //tree(s) as the children of each option in the phase
@@ -83,15 +84,15 @@ object ConfigurationSpace {
       //(5) element is a component, store standalone component in a node. 
       // Recursively populate the rest of the tree setting the resulting  
       // tree(s) as the children of the node
-      case (head @ ExecutableConf(_, _)) :: tail => Stream(Node(head, populateTree(tail, hist #::: Stream(head)), hist))
+      case (head @ AtomicExecutableConf(_,_)) :: tail => Stream(Node(head, populateTree(tail, hist #::: Stream(head)), hist))
     }
     //begin populating tree by expanding the root node containing the collection-reader.
     confDes match {
-      case ConfigurationDescriptor(_, collectionReader, pipeline) => Root[CollectionReaderDescriptor, ExecutableConf](collectionReader, populateTree(pipeline, Stream(collectionReader)))
+      case ConfigurationDescriptor(_, collectionReader, pipeline) => Root[CollectionReaderDescriptor, AtomicExecutableConf](collectionReader, populateTree(pipeline, Stream(collectionReader)))
     }
   }
 
-  type NodeExpander = ExecutableConf => Stream[ExecutableConf]
+  type NodeExpander = AtomicExecutableConf => Stream[AtomicExecutableConf]
 
   /**
    * Applies a [[NodeExpander]] to each of the nodes in the configuration space
@@ -100,15 +101,15 @@ object ConfigurationSpace {
    * @param expand the [[NodeExpander]] to be applied to the nodes.
    * @return the expanded space.
    */
-  def expandNodes(expand: NodeExpander, confSpace: Root[CollectionReaderDescriptor, ExecutableConf]): Root[CollectionReaderDescriptor, ExecutableConf] = {
+  def expandNodes(expand: NodeExpander, confSpace: Root[CollectionReaderDescriptor, AtomicExecutableConf]): Root[CollectionReaderDescriptor, AtomicExecutableConf] = {
     /*since expand returns a list of components, wrap the component in a leaf or a node*/
-    def expandNode(expand: NodeExpander, tree: TreeWithHistory[ExecutableConf]) = tree match {
+    def expandNode(expand: NodeExpander, tree: TreeWithHistory[AtomicExecutableConf]) = tree match {
       case Leaf(elem, hist) => expand(elem).map(Leaf(_, hist))
       case TreeWithChildren(elem, children, hist) => expand(elem).map(Node(_, children, hist))
     }
 
     /*perform a depth-first traversal of the tree applying expand to all of the nodes*/
-    def expandNodes(expand: NodeExpander, confSpace: TreeWithHistory[ExecutableConf] with Child): TreeWithHistory[ExecutableConf] with Child = confSpace match {
+    def expandNodes(expand: NodeExpander, confSpace: TreeWithHistory[AtomicExecutableConf] with Child): TreeWithHistory[AtomicExecutableConf] with Child = confSpace match {
       case Leaf(elem, hist) => Leaf(elem, hist)
       case Node(elem, children, hist) => Node(elem, children.flatMap(expandNode(expand, _)).map(expandNodes(expand, _)), hist)
     }
@@ -120,7 +121,7 @@ object ConfigurationSpace {
    *
    *
    */
-  def crossOptsExpander[K, V](elem: ExecutableConf): Stream[ExecutableConf] = {
+  def crossOptsExpander[K, V](elem: AtomicExecutableConf): Stream[AtomicExecutableConf] = {
     def crossParamsExpander[K, V](crossParams: Map[K, List[V]]): Stream[Map[K, V]] = crossParams.keys.toList match {
       case Nil => Stream(Map())
       case headKey :: tailKeys => {

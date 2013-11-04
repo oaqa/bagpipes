@@ -51,17 +51,19 @@ package test {
     implicit def createTrace(strm: ElementWithHistory): Trace = strm match { case (elem, hist) => Trace(0, hist #::: Stream(elem)) }
     trait TestScorer extends Scorer[Int] {
       val scoreMap: Map[Trace, Double]
-      override def score(trace: Trace): Double = if (scoreMap.contains(trace)) scoreMap(trace) else 1
-
+      override def score(trace: Trace, result: Option[Int]): Double = if (scoreMap.contains(trace)) scoreMap(trace) else 1
     }
+
     object TestScorer1 extends TestScorer {
       override val scoreMap = Map[Trace, Double](
+        createTrace(roomAnnotator2, history1) -> 2,
         createTrace(roomAnnotator1, history1) -> 3,
         createTrace(dateTimeAnnotator, history2) -> 5)
     }
 
     object TestScorer2 extends TestScorer {
       override val scoreMap = Map[Trace, Double](
+        createTrace(roomAnnotator1, history1) -> 5,
         createTrace(roomAnnotator2, history1) -> 3,
         createTrace(simpleDateTimeAnnotator, history3) -> 5)
     }
@@ -90,10 +92,8 @@ package test {
 
   trait kBest extends exploredSpace with scorers {
     override val exploredConfTree4 = exploredConfTree1 #::: Stream[ElementWithHistory]((dateTimeAnnotator, sharedHistory1))
-
     val exploredConfTree4_scorer1 = exploredConfTree1 #::: Stream[ElementWithHistory]((dateTimeAnnotator, sharedHistory1))
-    val exploredConfTree4_scorer2 = exploredConfTree0 #::: sharedConfSubTree1 #::: Stream[ElementWithHistory]((simpleDateTimeAnnotator, sharedHistory1))
-
+    val exploredConfTree4_scorer2 = exploredConfTree0 #::: sharedConfSubTree1 #::: Stream[ElementWithHistory]((simpleDateTimeAnnotator, sharedHistory2))
   }
 
 }

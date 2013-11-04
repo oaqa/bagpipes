@@ -34,6 +34,10 @@ object Descriptors {
     def getParams = params
     //extends ExecutableDescriptor with ConfExpr
   }
+
+  object AtomicExecutableConf {
+    def unapply(aExecConf: AtomicExecutableConf) = Some((aExecConf.getClassName, aExecConf.getParams))
+  }
   /**
    * Companion object for pattern-matching to distinguish between general
    * `PipelineDescriptor` and `ExecutableConf`.
@@ -46,8 +50,18 @@ object Descriptors {
   sealed abstract class ExecutableComponent(className: String, params: Map[String, Parameter]) extends ExecutableConf(className: String, params: Map[String, Parameter])
   case class ConfigurationDescriptor(configuration: Configuration, `collection-reader`: CollectionReaderDescriptor, pipeline: List[PhaseDescriptor] = Nil)
   case class Configuration(name: String = "default-config", author: String = "default-author")
-  case class ComponentDescriptor(`class`: String, params: Map[String, Parameter] = Map()) extends AtomicExecutableConf(`class`, params)
-  case class CollectionReaderDescriptor(`collection-class`: String, params: Map[String, Parameter] = Map()) extends AtomicExecutableConf(`collection-class`, params) with PipelineDescriptor
-  case class PhaseDescriptor(phase: String, options: List[ExecutableConf]) extends PipelineDescriptor
-  case class CrossComponentDescriptor(`class`: String, params: Map[String, Parameter] = Map(), `cross-opts`: Map[String, ListParameter] = Map()) extends ExecutableConf(`class`, params)
+  case class ComponentDescriptor(`class`: String, params: Map[String, Parameter] = Map()) extends AtomicExecutableConf(`class`, params) {
+    // need to expiicitly declare constructors with default arguments to make lift-json extraction happy
+    def this(`class`: String) = this(`class`, Map())
+  }
+  case class CollectionReaderDescriptor(`collection-class`: String, params: Map[String, Parameter] = Map()) extends AtomicExecutableConf(`collection-class`, params) with PipelineDescriptor {
+    // need to expiicitly declare constructors with default arguments to make lift-json extraction happy
+    def this(`collection-class`: String) = this(`collection-class`, Map())
+  }
+  case class PhaseDescriptor(phase: String, options: List[AtomicExecutableConf]) extends PipelineDescriptor
+  case class CrossComponentDescriptor(`class`: String, params: Map[String, Parameter] = Map(), `cross-opts`: Map[String, ListParameter] = Map()) extends AtomicExecutableConf(`class`, params) {
+    // need to expiicitly declare constructors with default arguments to make lift-json extraction happy
+    def this(`class`: String, `cross-opts`: Map[String, ListParameter]) = this(`class`, Map(), `cross-opts`)
+  }
+
 }

@@ -32,10 +32,9 @@ class KBestPathExplorer[I](implicit scorer: Scorer[I]) extends Explorer[Collecti
   //5. Provide some static methods to eliminate various boilerplate sections
   //6. Basically, implement a "reduce" for a tree
   //7. ...Then think about a "beamed-reduce" for a tree --- one that only looks at a subset thereof
-  case class BestPath(current: TreeWithHistory[AtomicExecutableConf], thisWeightMap: Map[NodeId, Double] = Map())(implicit input: Int) extends Path {
+  case class BestPath(current: TreeWithHistory[AtomicExecutableConf], thisWeightMap: Map[NodeId, Double] = Map())(implicit input: I) extends Path {
     val thisKey: NodeId = getId(current)
-    val thisWeight: Double = getWeight(thisKey)
-
+    val thisWeight: Double = scorer.score(current)
     override def ++(thatPath: Path): Path = thatPath match {
       case BestPath(TreeWithHistory(elem, hist), thatWeightMap) =>
         val thatKey = (elem, hist)
@@ -71,18 +70,15 @@ class KBestPathExplorer[I](implicit scorer: Scorer[I]) extends Explorer[Collecti
   }
 
   object BestPath {
-    def getWeight(thisKey: (AtomicExecutableConf, Stream[AtomicExecutableConf]))(implicit input: Int) =
-      scorer.score(Trace(input, thisKey._2 #::: Stream(thisKey._1)))
     def getId(tree: TreeWithHistory[AtomicExecutableConf]): (AtomicExecutableConf, Stream[AtomicExecutableConf]) =
       TreeWithHistory.unapply(tree).get
-    def apply(tree: TreeWithHistory[AtomicExecutableConf])(implicit input: Int): BestPath = {
-      val id = getId(tree)
-      val weight = getWeight(id)
-      BestPath(tree, Map(getId(tree) -> getWeight(id)))
+    def apply(tree: TreeWithHistory[AtomicExecutableConf])(implicit input: I): BestPath = {
+      val weight = scorer.score(tree)
+      BestPath(tree, Map(getId(tree) -> weight))
     }
   }
 
-  override def from(initial: Stream[TreeWithHistory[AtomicExecutableConf]])(implicit input: Int): Stream[TreeWithHistory[AtomicExecutableConf]] = {
+  override def from(initial: Stream[TreeWithHistory[AtomicExecutableConf]])(implicit input: I): Stream[TreeWithHistory[AtomicExecutableConf]] = {
     def from(initial: Stream[TreeWithHistory[AtomicExecutableConf]]): Path = initial match {
       case Stream() => EmptyPath()
       case (current @ Leaf(_, _)) #:: siblings => BestPath(current) ++ from(siblings)

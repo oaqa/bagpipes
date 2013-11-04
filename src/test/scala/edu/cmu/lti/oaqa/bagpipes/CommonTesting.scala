@@ -54,7 +54,7 @@ pipeline:
 
     //annotators
     //Ex1: RoomNumberAnnotator: 
-    val roomAnnotator1 = ComponentDescriptor(getPath(1, "RoomNumberAnnotator"), testParams)
+    val roomAnnotator1 = ComponentDescriptor(getPath(1, "RoomNumberAnnotator"))//, testParams)
     //Ex2: RoomNumberAnnotator
     val roomAnnotator2 = ComponentDescriptor(getPath(2, "RoomNumberAnnotator"), roomannotator2Params)
 

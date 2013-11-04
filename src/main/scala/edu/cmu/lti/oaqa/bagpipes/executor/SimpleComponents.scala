@@ -26,7 +26,7 @@ object SimpleExecutor extends Executor[String, SimpleComponent] {
 
     final class SimpleReader(componentDesc: CollectionReaderDescriptor) extends Reader[String] with SimpleComponent {
       def execute(trace: String) = trace + componentDesc.toString
-      override def getTotalInputs = 5
+      override def getTotalInputs = 2
       def destroy = {}
     }
     final class SimpleAnnotator(componentDesc: ComponentDescriptor) extends Annotator[String] with SimpleComponent {

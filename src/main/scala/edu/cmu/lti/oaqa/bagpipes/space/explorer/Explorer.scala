@@ -15,10 +15,10 @@ import edu.cmu.lti.oaqa.bagpipes.scorer.DefaultScorer
  * @author Avner Maiberg (amaiberg@cs.cmu.edu)
  */
 
-abstract class Explorer[R <: T, T, I](implicit scorer: Scorer[Int] = new DefaultScorer[Int]()) /* extends HistoryTypes[T]*/ {
+abstract class Explorer[R <: T, T, I](implicit scorer: Scorer[I] = new DefaultScorer[I]()) /* extends HistoryTypes[T]*/ {
   type ExecutableTree = TreeWithHistory[T]
-  def from(initial: Stream[TreeWithHistory[T]])(implicit input: Int): Stream[TreeWithHistory[T]]
-  def fromRoot(root: Root[R, T])(implicit input: Int): Stream[TreeWithHistory[T]] = from(Stream(root))
+  def from(initial: Stream[TreeWithHistory[T]])(implicit input: I): Stream[TreeWithHistory[T]]
+  def fromRoot(root: Root[R, T])(implicit input: I): Stream[TreeWithHistory[T]] = from(Stream(root))
 }
  
 

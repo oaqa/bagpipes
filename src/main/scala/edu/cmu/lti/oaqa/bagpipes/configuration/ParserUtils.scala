@@ -8,6 +8,8 @@ import edu.cmu.lti.oaqa.bagpipes.configuration.Parameters._
 import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors._
 import net.liftweb.json.DefaultFormats
 import net.liftweb.json.ShortTypeHints
+import net.liftweb.json.FullTypeHints
+import net.liftweb.json.TypeHints
 
 /**
  * A collection of utility methods used by [[$packagePath.Parser]].
@@ -63,6 +65,7 @@ object ParserUtils {
     //scala.collections.map->JSONObject
     //implicit value "formats" is used in decomposition of map into JSONObject.
     val jsonObjConf = decompose(configMap)
+    
     //Deserialize to Scala case classes
     // JSONObj -> ConfigurationDescriptor
     jsonObjConf.extract[C]
@@ -93,6 +96,8 @@ object ParserUtils {
 
   def loadFileContent(in: String): String = {
     println("getFile: " + in)
-    fromInputStream(getClass.getResourceAsStream(in)).mkString
+    val contents = fromInputStream(getClass.getResourceAsStream(in)).mkString
+    println("contents: " + contents)
+    contents
   }
 }

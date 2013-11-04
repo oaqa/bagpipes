@@ -76,9 +76,12 @@ import net.liftweb.json.TypeHints
 trait Parser {
 
   /**Returns a new [[$confDes]] from parsed contents of a configuration descriptor */
-  def parse(resource: String): ConfigurationDescriptor = {
+  def parse(resource: String, fromFile: Boolean = false): ConfigurationDescriptor = {
     //YAML->java.util.map->scala.collections.Map
-    val resMap = getConfigurationMap(resource)
+    val resMap = fromFile match {
+      case false => getConfigurationMap(resource)
+      case true => getConfigurationMapFromPath(resource)
+    }
     parse(resMap)
   }
 
@@ -184,12 +187,13 @@ trait Parser {
     //else just recursively flatten the map
     case _ => flattenConfMap(confMap)
   }
-
+  //disambiguate executable components
+  //must do so explicitly because lift.json cannot handle polymorphism in all cases
   def extractComponent(confMap: Map[String, Any]) =
     if (confMap.contains("collection-class")) extract[CollectionReaderDescriptor](confMap)
     else if (confMap.contains("cross-opts"))
       extract[CrossComponentDescriptor](confMap)
-    else if (confMap.contains("params")) extract[ComponentDescriptor](confMap)
+    else if (confMap.contains("class")) extract[ComponentDescriptor](confMap)
     else confMap
 
   /**
