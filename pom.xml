@@ -79,6 +79,16 @@
 			<artifactId>snakeyaml</artifactId>
 			<version>1.10</version>
 		</dependency>
+		<dependency>
+			<groupId>com.typesafe</groupId>
+			<artifactId>scalalogging-slf4j_2.10</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.typesafe</groupId>
+			<artifactId>scalalogging-log4j_2.10</artifactId>
+			<version>1.0.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>
