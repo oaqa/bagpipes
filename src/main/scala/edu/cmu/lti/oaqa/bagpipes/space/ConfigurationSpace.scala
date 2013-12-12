@@ -1,10 +1,10 @@
 package edu.cmu.lti.oaqa.bagpipes.space
 import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors._
-import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.ExecutableConf._
+import edu.cmu.lti.oaqa.bagpipes.configuration.AbstractDescriptors._
+
 import edu.cmu.lti.oaqa.bagpipes.configuration.Parameters.Parameter
 import org.apache.uima.collection.CollectionReader
 import edu.cmu.lti.oaqa.bagpipes.configuration.Parameters._
-import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.AtomicExecutableConf
 
 /**
  * Provides mapping between configuration descriptor to configuration space.
@@ -13,7 +13,7 @@ import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.AtomicExecutableConf
  * The following configuration descriptor,
  * {{{
  * (<-----------------ConfigurationDescriptor----------------->)
- *                    (<------Phases----->) 
+ *                    (<------Phases----->)
  * collection-reader   p_0     p_1     p_2     standalone
  * -----------------  ------  ------  ------  -----------
  * 		                      c_1_0
@@ -74,21 +74,26 @@ object ConfigurationSpace {
       case Nil => Stream()
       //(2) last element is a phase, expand phase to its list of options as new leaves. 
       //(reached end of pipeline)
-      case PhaseDescriptor(_, options) :: Nil => options.toStream.map(Leaf[AtomicExecutableConf](_, hist))
+      case PhaseDescriptor(_, options) :: Nil =>
+        options.toStream.map(Leaf[AtomicExecutableConf](_, hist))
       //(3) last element is a component, return component in a new leaf. (reached end of pipeline)
       case (head @ AtomicExecutableConf(_, _)) :: Nil => Stream(Leaf(head, hist))
       //(4) element is a phase, expand phase to its list of options. 
       //Recursively populate the rest  of the tree, and setting the resulting 
       //tree(s) as the children of each option in the phase
-      case PhaseDescriptor(_, options) :: tail => options.toStream.map(execDesc => Node(execDesc, populateTree(tail, hist #::: Stream(execDesc)), hist))
+      case PhaseDescriptor(_, options) :: tail =>
+        options.toStream.map(execDesc => //for all options
+          Node(execDesc, populateTree(tail, hist #::: Stream(execDesc)), hist))
       //(5) element is a component, store standalone component in a node. 
       // Recursively populate the rest of the tree setting the resulting  
       // tree(s) as the children of the node
-      case (head @ AtomicExecutableConf(_,_)) :: tail => Stream(Node(head, populateTree(tail, hist #::: Stream(head)), hist))
+      case (head @ AtomicExecutableConf(_, _)) :: tail =>
+        Stream(Node(head, populateTree(tail, hist #::: Stream(head)), hist))
     }
     //begin populating tree by expanding the root node containing the collection-reader.
     confDes match {
-      case ConfigurationDescriptor(_, collectionReader, pipeline) => Root[CollectionReaderDescriptor, AtomicExecutableConf](collectionReader, populateTree(pipeline, Stream(collectionReader)))
+      case ConfigurationDescriptor(_, collectionReader, pipeline) =>
+        Root[CollectionReaderDescriptor, AtomicExecutableConf](collectionReader, populateTree(pipeline, Stream(collectionReader)))
     }
   }
 
@@ -113,26 +118,17 @@ object ConfigurationSpace {
       case Leaf(elem, hist) => Leaf(elem, hist)
       case Node(elem, children, hist) => Node(elem, children.flatMap(expandNode(expand, _)).map(expandNodes(expand, _)), hist)
     }
-
     Root(confSpace.root, confSpace.trees.flatMap(expandNode(expand, _)).map(expandNodes(expand, _)))
   }
 
   /**
-   *
+   * Does cross-opts expansion on parameters of `CrossComponentDescriptors`.
    *
    */
-  def crossOptsExpander[K, V](elem: AtomicExecutableConf): Stream[AtomicExecutableConf] = {
-    def crossParamsExpander[K, V](crossParams: Map[K, List[V]]): Stream[Map[K, V]] = crossParams.keys.toList match {
-      case Nil => Stream(Map())
-      case headKey :: tailKeys => {
-        for {
-          p <- crossParams(headKey)
-          pMap <- crossParamsExpander(crossParams.tail.toMap)
-        } yield Map(headKey -> p) ++ pMap
-      }.toStream
-    }
+  def crossOptsExpander(elem: AtomicExecutableConf): Stream[AtomicExecutableConf] = {
+
     elem match {
-      case CrossComponentDescriptor(name, params, crossParams) => for (pMap <- crossParamsExpander[String, Parameter](crossParams.flatMap { case (k, v) => Map(k -> v.pList) })) yield ComponentDescriptor(name, params ++ pMap)
+      case ccDesc @ CrossComponentDescriptor(name, params, crossParams) => ccDesc.expand
       case other => Stream(other)
     }
   }

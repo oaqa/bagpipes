@@ -3,9 +3,8 @@ import edu.cmu.lti.oaqa.bagpipes.space.explorer.Explorer
 import edu.cmu.lti.oaqa.bagpipes.space.explorer.SimpleExplorer._
 import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.ConfigurationDescriptor
 import edu.cmu.lti.oaqa.bagpipes.space.ConfigurationSpace
-import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.ExecutableConf
 import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.CollectionReaderDescriptor
-import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.ComponentDescriptor
+import edu.cmu.lti.oaqa.bagpipes.configuration.AbstractDescriptors._
 import edu.cmu.lti.oaqa.bagpipes.controller.ExecutionController
 import edu.cmu.lti.oaqa.bagpipes.executor.uima.UimaExecutor
 import edu.cmu.lti.oaqa.bagpipes.space.explorer.DepthExplorer

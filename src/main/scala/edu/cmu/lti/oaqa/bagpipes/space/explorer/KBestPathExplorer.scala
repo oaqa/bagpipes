@@ -1,7 +1,6 @@
 package edu.cmu.lti.oaqa.bagpipes.space.explorer
 import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.CollectionReaderDescriptor
-import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.AtomicExecutableConf
-import edu.cmu.lti.oaqa.bagpipes.executor.Trace
+import edu.cmu.lti.oaqa.bagpipes.configuration.AbstractDescriptors._
 import edu.cmu.lti.oaqa.bagpipes.scorer.Scorer
 import edu.cmu.lti.oaqa.bagpipes.space.Leaf
 import edu.cmu.lti.oaqa.bagpipes.space.TreeWithChildren

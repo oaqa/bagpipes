@@ -185,16 +185,24 @@ trait Parser {
     }
     // case ("collection-reader", v: String) => extract[CollectionReaderDescriptor](flattenComponent(confMap,v))
     //else just recursively flatten the map
+
+    case ("phase", v: String) => {
+      extract[PhaseDescriptor](flattenConfMap(confMap))
+    }
+
     case _ => flattenConfMap(confMap)
   }
-  //disambiguate executable components
+  //DISAMBIGUATE executable components
   //must do so explicitly because lift.json cannot handle polymorphism in all cases
   def extractComponent(confMap: Map[String, Any]) =
     if (confMap.contains("collection-class")) extract[CollectionReaderDescriptor](confMap)
+    else if (confMap.contains("cross-opts") && confMap.contains("evaluator"))
+      extract[CrossEvaluatorDescriptor](confMap)
     else if (confMap.contains("cross-opts"))
-      extract[CrossComponentDescriptor](confMap)
-    else if (confMap.contains("class")) extract[ComponentDescriptor](confMap)
-    else confMap
+      extract[CrossSimpleComponentDescriptor](confMap)
+    else if (confMap.contains("evaluator")) extract[EvaluatorDescriptor](confMap)
+    else if (confMap.contains("class")) extract[SimpleComponentDescriptor](confMap)
+    else flattenConfMap(confMap)
 
   /**
    * Returns "flattened," effective version of the component where all "inherits" are

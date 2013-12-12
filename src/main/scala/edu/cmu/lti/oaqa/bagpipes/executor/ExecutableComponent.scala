@@ -1,18 +1,28 @@
 package edu.cmu.lti.oaqa.bagpipes.executor
 
-import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.ComponentDescriptor
+import edu.cmu.lti.oaqa.bagpipes.configuration.AbstractDescriptors._
 import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.CollectionReaderDescriptor
+import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.EvaluatorDescriptor
 
 abstract trait Reader[I] {
   //def hasNext() : Boolean
   //def getNext(input: I) : Unit
-  def getTotalInputs() : Int
+  def getTotalInputs(): Int
 }
 
-abstract trait Annotator[I] 
+abstract trait Evaluator[I, T] {
+ // val candidateAdapter: Adapter[I, T]
+//  val gsAdapter: Adapter[I, T]
+}
 
-trait ExecutableComponent[I] {
-  def execute(input: I): I
+abstract trait Adapter[I, T] {
+  def getCandidates(input: I): List[T]
+}
+
+abstract trait Annotator[I]
+
+trait ExecutableComponent[I] extends ExecutorTypes[I, ExecutableComponent[I]] {
+  def execute(input: Result[I]): Result[I]
   def destroy()
 }
 

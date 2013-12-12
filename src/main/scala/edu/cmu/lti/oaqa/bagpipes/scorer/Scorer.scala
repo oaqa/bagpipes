@@ -4,7 +4,7 @@ import edu.cmu.lti.oaqa.bagpipes.executor.ExecutableComponent
 import edu.cmu.lti.oaqa.bagpipes.executor.ExecutorTypes
 import edu.cmu.lti.oaqa.bagpipes.executor.Trace
 import edu.cmu.lti.oaqa.bagpipes.space.TreeWithHistory
-import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.AtomicExecutableConf
+import edu.cmu.lti.oaqa.bagpipes.configuration.AbstractDescriptors._
 import edu.cmu.lti.oaqa.bagpipes.executor.ExecutionResult
 
 abstract class Scorer[I] {

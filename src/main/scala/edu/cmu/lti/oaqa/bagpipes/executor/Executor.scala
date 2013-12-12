@@ -1,8 +1,7 @@
 package edu.cmu.lti.oaqa.bagpipes.executor
-import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.AtomicExecutable
+import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors._
 import scala.collection.immutable.Stream.consWrapper
-import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.AtomicExecutableConf
-
+import edu.cmu.lti.oaqa.bagpipes.configuration.AbstractDescriptors._
 /**
  * A generic strategist that does all the high-level "bookkeeping"
  * for execution pipelines (i.e., keeping track of the trace (and subtraces),
@@ -19,7 +18,7 @@ trait Executor[I, C <: ExecutableComponent[I]] extends ExecutorTypes[I, C] {
 
   protected val componentFactory: ComponentFactory[I, C]
 
-  protected def getFirstInput: I
+  def getFirstInput: Result[I]
   final def getEmptyCache(input: Int) = Cache(Map(Trace(input, Stream()) -> getFirstInput), Map())
   final def getComponentFactory = componentFactory
   /**
@@ -36,18 +35,19 @@ trait Executor[I, C <: ExecutableComponent[I]] extends ExecutorTypes[I, C] {
    * 	The process trace of components associated with the next input
    */
   //def execute(execDesc: ExecutableConf, trace: Trace) = ???
-  final def execute(execDesc: AtomicExecutableConf, trace: Trace)(implicit cache: Cache): Result = {
+  final def execute(execDesc: AtomicExecutableConf, trace: Trace)(implicit cache: Cache): (Result[I], Cache) = {
     val newTrace: Trace = trace ++ execDesc // update trace
     val component: C = if (cache.componentCache.contains(newTrace.componentTrace))
       cache.componentCache(newTrace.componentTrace) // get cached component
     else
       componentFactory.create(execDesc) // create new component from factory TODO: put this in factory
-    val prevExecResult: I = cache.dataCache(trace) //get previous result up to current sub-trace
-    val execResult: I = component.execute(prevExecResult) // execute using previous result as input
+    val prevExecResult: Result[I] = cache.dataCache(trace) //get previous result up to current sub-trace
+    val execResult: Result[I] = component.execute(prevExecResult) // execute using previous result as input
     val updatedCache: Cache = updateCache(execResult, component, newTrace)(cache) // update the cache
-    val result: Result = (execResult, updatedCache) // aggregate result with cache
+    val result = (execResult, updatedCache) // aggregate result with cache
     result // return result with cache for use in calling controller
   }
+
   def reset(cls: String, params: List[(String, Any)]): Boolean
 }
 

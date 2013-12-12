@@ -11,19 +11,19 @@ trait BagpipesDatabase {
   def createTables(): Unit
   def dropTables(): Unit
   def insertExperiment(exp: Experiment): Unit
-  def insertTrace(trc: Trace): Unit
+  def insertTrace(trc: DBTrace): Unit
   def insertMetric(mtrc: Metric): Unit
   def getExperiment(expUuid: String): Option[Experiment]
-  def getTrace(id: Int): Option[Trace]
-  def getTrace(trace: String, exp_id: String): Option[Trace]
-  def getTraces(expUuid: String): List[Trace]
+  def getTrace(id: Int): Option[DBTrace]
+  def getTrace(trace: String, exp_id: String): Option[DBTrace]
+  def getTraces(expUuid: String): List[DBTrace]
   def getMetric(trace_id: Int, name: String, target: String): Option[Metric]
   def getMetrics(trace_id: Int): List[Metric]
 }
 
 object BagpipesDatabase {
   case class Experiment(uuid: String, name: String, author: String, config: String, note: Option[String], timestamp: java.sql.Timestamp)
-  case class Trace(id: Option[Int], trace: String, expUuid: String, casXmi: Blob)
+  case class DBTrace(id: Option[Int], trace: String, expUuid: String, casXmi: Blob)
   case class Metric(trace_id: Int, name: String, target: String, value: Double)
   
   /** Get a Timestamp object for the current time. */

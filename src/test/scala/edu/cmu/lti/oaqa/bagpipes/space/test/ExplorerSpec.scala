@@ -8,7 +8,7 @@ import edu.cmu.lti.oaqa.bagpipes.configuration.Implicits._
 import edu.cmu.lti.oaqa.bagpipes.space.ConfigurationSpace
 import edu.cmu.lti.oaqa.bagpipes.space.ConfigurationSpace._
 import edu.cmu.lti.oaqa.bagpipes.space._
-import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.AtomicExecutableConf
+import edu.cmu.lti.oaqa.bagpipes.configuration.AbstractDescriptors._
 import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.CollectionReaderDescriptor
 import edu.cmu.lti.oaqa.bagpipes.space.explorer.KBestPathExplorer
 import edu.cmu.lti.oaqa.bagpipes.space.explorer.DepthExplorer
@@ -54,7 +54,7 @@ class ExplorerSpec extends FeatureSpec with HistoryTypes[AtomicExecutableConf] {
       }
       scenario("confTree3") {
         assertEquals(exploredConfTree3, BreadthExplorer.fromRoot(confTree3))
-      }
+      } 
       scenario("confTree4") {
         assertEquals(exploredConfTree4, BreadthExplorer.fromRoot(confTree4))
       }

@@ -4,7 +4,7 @@ import java.sql.Timestamp
 import scala.slick.driver.SQLiteDriver.simple._
 import scala.slick.jdbc.{StaticQuery => Q}
 import Database.threadLocalSession
-import BagpipesDatabase.{Experiment, Trace, Metric}
+import BagpipesDatabase.{Experiment, DBTrace, Metric}
 import javax.sql.rowset.serial.SerialBlob
 
 class SqliteDB(url: String) extends BagpipesDatabase {
@@ -22,7 +22,7 @@ class SqliteDB(url: String) extends BagpipesDatabase {
     def * = uuid ~ name ~ author ~ config ~ note ~ timestamp <> (Experiment, Experiment.unapply(_))
   }
   
-  object Traces extends Table[Trace]("traces") {
+  object Traces extends Table[DBTrace]("traces") {
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     def trace = column[String]("trace", O.NotNull)
     def exp_uuid = column[String]("experiment_uuid")
@@ -30,10 +30,10 @@ class SqliteDB(url: String) extends BagpipesDatabase {
     // Constraints
     def fk = foreignKey("EXP_FK", exp_uuid, Experiments)(_.uuid)
     // Mappings
-    def * = id.? ~ trace ~ exp_uuid ~ cas_xmi <> ({t => Trace(t._1, t._2, t._3, new SerialBlob(t._4))},
-        {(t: Trace) => Some((t.id, t.trace, t.expUuid, t.casXmi.getBytes(1, t.casXmi.length().toInt)))})
-    def forInsert = trace ~ exp_uuid ~ cas_xmi <> ({t => Trace(None, t._1, t._2, new SerialBlob(t._3))},
-        {(t: Trace) => Some((t.trace, t.expUuid, t.casXmi.getBytes(1, t.casXmi.length().toInt)))})
+    def * = id.? ~ trace ~ exp_uuid ~ cas_xmi <> ({t => DBTrace(t._1, t._2, t._3, new SerialBlob(t._4))},
+        {(t: DBTrace) => Some((t.id, t.trace, t.expUuid, t.casXmi.getBytes(1, t.casXmi.length().toInt)))})
+    def forInsert = trace ~ exp_uuid ~ cas_xmi <> ({t => DBTrace(None, t._1, t._2, new SerialBlob(t._3))},
+        {(t: DBTrace) => Some((t.trace, t.expUuid, t.casXmi.getBytes(1, t.casXmi.length().toInt)))})
   }
   
   object Metrics extends Table[Metric]("metrics") {
@@ -98,7 +98,7 @@ class SqliteDB(url: String) extends BagpipesDatabase {
   }
   
   /** Insert a Trace into the database. */
-  def insertTrace(trc: Trace): Unit = {
+  def insertTrace(trc: DBTrace): Unit = {
     db withSession { Traces.forInsert.insert(trc) }
   }
   
@@ -132,7 +132,7 @@ class SqliteDB(url: String) extends BagpipesDatabase {
    * @param id
    *  	the trace id
    */
-  def getTrace(id: Int): Option[Trace] = {
+  def getTrace(id: Int): Option[DBTrace] = {
     val q = Query(Traces).filter(_.id === id)
     db withSession {
       try {
@@ -154,7 +154,7 @@ class SqliteDB(url: String) extends BagpipesDatabase {
    * @param exp_id
    * 	Unique identifier for the Experiment that this trace belongs to
    */
-  def getTrace(trace: String, expUuid: String): Option[Trace] = {
+  def getTrace(trace: String, expUuid: String): Option[DBTrace] = {
     val q = Query(Traces).filter(_.trace === trace).filter(_.exp_uuid === expUuid)
     db withSession { 
       try {
@@ -172,7 +172,7 @@ class SqliteDB(url: String) extends BagpipesDatabase {
   /**
    * 
    */
-  def getTraces(expUuid: String): List[Trace] = {
+  def getTraces(expUuid: String): List[DBTrace] = {
     val q = Query(Traces).filter(_.exp_uuid === expUuid)
     db withSession { q.elements.to[List] }
   }

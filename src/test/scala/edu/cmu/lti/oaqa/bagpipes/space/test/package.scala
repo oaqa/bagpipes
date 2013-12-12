@@ -2,6 +2,7 @@ package edu.cmu.lti.oaqa.bagpipes.space
 import edu.cmu.lti.oaqa.bagpipes.CommonTesting._
 import edu.cmu.lti.oaqa.bagpipes.space.ConfigurationSpace._
 import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors._
+import edu.cmu.lti.oaqa.bagpipes.configuration.AbstractDescriptors._
 import edu.cmu.lti.oaqa.bagpipes.scorer.Scorer
 import edu.cmu.lti.oaqa.bagpipes.executor.Trace
 package test {
@@ -45,6 +46,8 @@ package test {
     //tree 6: cross-opts (expanded)
     val confTree6 = Root(collectionReader,
       expandedCrossOptAnnotators1.toStream.map((c: AtomicExecutableConf) => Leaf(c, history1)))
+      
+      
   }
 
   protected trait scorers extends exploredSpace with confTrees {

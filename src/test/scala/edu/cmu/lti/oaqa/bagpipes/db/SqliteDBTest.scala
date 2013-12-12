@@ -1,6 +1,6 @@
 package edu.cmu.lti.oaqa.bagpipes.db
 
-import BagpipesDatabase.{Experiment, Trace, Metric, getTimestamp}
+import BagpipesDatabase.{Experiment, DBTrace, Metric, getTimestamp}
 import org.junit.runner.RunWith
 import org.scalatest.BeforeAndAfter
 import org.scalatest.FunSuite
@@ -14,7 +14,7 @@ class SqliteDBTest extends FunSuite with BeforeAndAfter {
 
   val db: SqliteDB = new SqliteDB("jdbc:sqlite:mem:test")
   var exp: Experiment = _
-  var traces: List[Trace] = _
+  var traces: List[DBTrace] = _
   
   /** Return a Blob created from 10 random bytes. 
    *  (Convenience function for testing database blob functions)
@@ -33,10 +33,10 @@ class SqliteDBTest extends FunSuite with BeforeAndAfter {
     db.dropTables()
     db.createTables()
     exp = new Experiment("randomID", "experiment name", "Tester", "this: \"is some YAML\"", Some("This is a test entry"), getTimestamp())
-    traces = List(new Trace(None, "component1", "randomID", getRandomBlob()),
-        new Trace(None, "component1~componentA", "randomID", getRandomBlob()),
-        new Trace(None, "component1~componentB", "randomID", getRandomBlob()),
-        new Trace(None, "component1~componentB~componentZ", "randomID", getRandomBlob()))
+    traces = List(new DBTrace(None, "component1", "randomID", getRandomBlob()),
+        new DBTrace(None, "component1~componentA", "randomID", getRandomBlob()),
+        new DBTrace(None, "component1~componentB", "randomID", getRandomBlob()),
+        new DBTrace(None, "component1~componentB~componentZ", "randomID", getRandomBlob()))
   }
   
   /**

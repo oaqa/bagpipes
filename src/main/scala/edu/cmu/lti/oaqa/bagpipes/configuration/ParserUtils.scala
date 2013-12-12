@@ -52,9 +52,11 @@ object ParserUtils {
     classOf[BooleanParameter],
     classOf[ListParameter],
     classOf[MapParameter],
-    classOf[ComponentDescriptor],
-    classOf[CrossComponentDescriptor],
+    classOf[CrossSimpleComponentDescriptor],
+    classOf[EvaluatorDescriptor],
     classOf[CollectionReaderDescriptor],
+    classOf[SimpleComponentDescriptor],
+    classOf[CrossEvaluatorDescriptor],
     classOf[PhaseDescriptor])
   /*The list of all formats that tell the parser which types to extract.
     Append to this list to support new types.*/
@@ -65,7 +67,7 @@ object ParserUtils {
     //scala.collections.map->JSONObject
     //implicit value "formats" is used in decomposition of map into JSONObject.
     val jsonObjConf = decompose(configMap)
-    
+
     //Deserialize to Scala case classes
     // JSONObj -> ConfigurationDescriptor
     jsonObjConf.extract[C]

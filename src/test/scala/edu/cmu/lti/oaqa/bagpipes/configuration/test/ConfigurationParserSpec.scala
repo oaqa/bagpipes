@@ -46,10 +46,25 @@ class ConfigurationParserSpec extends FeatureSpec {
         val parsedEx4 = parser.parse(ex4)
         assert(confEx4 === parsedEx4)
       }
-      
-      scenario("ex5: collection-reader + component with cross-opts") {
-        val parsedEx5 = parser.parse(ex6)
+
+      scenario("ex5: collection-reader + single standalone component") {
+        val parsedEx5 = parser.parse(ex5)
         assert(confEx5 === parsedEx5)
+      }
+
+      scenario("ex6: collection-reader + component with cross-opts") {
+        val parsedEx6 = parser.parse(ex6)
+        assert(confEx6 === parsedEx6)
+      }
+
+      scenario("ex7: collection-reader + single standalone component + evaluator") {
+        val parsedEx7 = parser.parse(ex7)
+        assert(confEx7 === parsedEx7)
+      }
+      
+      scenario("ex8: collection-reader + cross-evaluator") {
+        val parsedEx8 = parser.parse(ex8)
+        assert(confEx8 === parsedEx8)
       }
     }
   }
