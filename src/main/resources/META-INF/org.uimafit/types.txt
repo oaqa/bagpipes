@@ -1,2 +1,0 @@
-classpath*:types/TutorialTypeSystem.xml
-classpath*:types/SourceDocumentInformation.xml
