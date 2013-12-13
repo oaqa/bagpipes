@@ -8,7 +8,10 @@ import BagpipesDatabase.{Experiment, Trace, Metric}
 import javax.sql.rowset.serial.SerialBlob
 import com.typesafe.scalalogging.slf4j.Logging
 
-/** SQLite implementation of BagpipesDatabase */
+/** SQLite implementation of BagpipesDatabase.
+ *  
+ *  @author Collin McCormack
+ */
 class SqliteDB(url: String) extends BagpipesDatabase with Logging {
   
   val db = Database.forURL(url, driver = "org.sqlite.JDBC")
@@ -64,7 +67,7 @@ class SqliteDB(url: String) extends BagpipesDatabase with Logging {
    *            a foreign key constraint on traces.id
    *  name: descriptive name for the metric
    *  target: the target data/scope for the metric
-   *  value: the the decimal value for the metric
+   *  value: the decimal value for the metric
    *  
    *  Primary key = trace_id, name, target
    */
