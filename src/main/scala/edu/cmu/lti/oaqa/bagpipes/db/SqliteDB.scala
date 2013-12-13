@@ -201,7 +201,7 @@ class SqliteDB(url: String) extends BagpipesDatabase with Logging {
    * @param exp_id
    * 	Unique identifier for the Experiment that this trace belongs to
    */
-  def getTrace(trace: String, expUuid: String): Option[DBTrace] = {
+  def getTrace(trace: String, expUuid: String): Option[Trace] = {
     val q = Query(Traces).filter(_.trace === trace).filter(_.exp_uuid === expUuid)
     db withSession { 
       try {

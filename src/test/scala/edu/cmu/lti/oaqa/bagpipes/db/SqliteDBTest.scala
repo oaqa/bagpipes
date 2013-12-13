@@ -14,13 +14,13 @@ class SqliteDBTest extends FunSuite with BeforeAndAfter {
 
   val db: SqliteDB = new SqliteDB("jdbc:sqlite:mem:test")
   // Test data
-  var experiments = List(new Experiment("01234", "experiment one", "Tester", "this: \"is some YAML\"", Some("This is a test entry"), getTimestamp()),
+  val experiments = List(new Experiment("01234", "experiment one", "Tester", "this: \"is some YAML\"", Some("This is a test entry"), getTimestamp()),
         new Experiment("56789", "experiment two", "Tester", "other: \"YAML-ese\"", Some("Second test entry"), getTimestamp()))
-  var traces1 = List(new Trace(0, "component1", "01234", getRandomBlob()),
+  val traces1 = List(new Trace(0, "component1", "01234", getRandomBlob()),
         new Trace(0, "component1~componentA", "01234", getRandomBlob()),
         new Trace(0, "component1~componentB", "01234", getRandomBlob()),
         new Trace(0, "component1~componentB~componentZ", "01234", getRandomBlob()))
-  var traces2 = List(new Trace(0, "compZ~compX~Writer", "56789", getRandomBlob()),
+  val traces2 = List(new Trace(0, "compZ~compX~Writer", "56789", getRandomBlob()),
         new Trace(0, "compZ~compY~Writer", "56789", getRandomBlob()))
   
   /** Return a Blob created from 10 random bytes. 
@@ -98,7 +98,8 @@ class SqliteDBTest extends FunSuite with BeforeAndAfter {
     db.insertExperiment(experiments.head)
     traces1.map(t => db.insertTrace(t))
     // Negative result
-    assert(db.getTraceById(1).isEmpty)
+    assert(db.getTraceById(0).isEmpty)
+    assert(db.getTraceById(10).isEmpty)
 
     // Constant '1' assumes that this is the first trace to be inserted, somewhat hacky but should be fine
     val result = db.getTraceById(1).get
