@@ -1,0 +1,4 @@
+class: edu.cmu.lti.oaqa.bagpipes.components.dummy
+
+params:
+     param_a: foo
