@@ -61,10 +61,15 @@ class ConfigurationParserSpec extends FeatureSpec {
         val parsedEx7 = parser.parse(ex7)
         assert(confEx7 === parsedEx7)
       }
-      
+
       scenario("ex8: collection-reader + cross-evaluator") {
         val parsedEx8 = parser.parse(ex8)
         assert(confEx8 === parsedEx8)
+      }
+
+      scenario("ex9: flattened configuration from inherited component") {
+        val parsedEx9 = parser.parse(ex9)
+        assert(confEx9 === parsedEx9)
       }
     }
   }

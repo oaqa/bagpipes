@@ -2,6 +2,8 @@ package edu.cmu.lti.oaqa.bagpipes.executor
 import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors._
 import scala.collection.immutable.Stream.consWrapper
 import edu.cmu.lti.oaqa.bagpipes.configuration.AbstractDescriptors._
+import edu.cmu.lti.oaqa.bagpipes.annotation.Analytic
+import edu.cmu.lti.oaqa.bagpipes.annotation.SimpleAnalytic
 /**
  * A generic strategist that does all the high-level "bookkeeping"
  * for execution pipelines (i.e., keeping track of the trace (and subtraces),
@@ -39,11 +41,11 @@ trait Executor[I, C <: ExecutableComponent[I]] extends ExecutorTypes[I, C] {
     val newTrace: Trace = trace ++ execDesc // update trace
     val component: C = if (cache.componentCache.contains(newTrace.componentTrace))
       cache.componentCache(newTrace.componentTrace) // get cached component
-    else
+    else 
       componentFactory.create(execDesc) // create new component from factory TODO: put this in factory
     val prevExecResult: Result[I] = cache.dataCache(trace) //get previous result up to current sub-trace
     val execResult: Result[I] = component.execute(prevExecResult) // execute using previous result as input
-    val updatedCache: Cache = updateCache(execResult, component, newTrace)(cache) // update the cache
+    val updatedCache: Cache = updateCache(Result[I](execResult.getInput)(SimpleAnalytic(Nil)), component, newTrace)(cache) // update the cache
     val result = (execResult, updatedCache) // aggregate result with cache
     result // return result with cache for use in calling controller
   }

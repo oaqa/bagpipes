@@ -12,10 +12,10 @@ import edu.cmu.lti.oaqa.bagpipes.space.explorer.BreadthExplorer
 import edu.cmu.lti.oaqa.bagpipes.space.explorer.KBestPathExplorer
 import edu.cmu.lti.oaqa.bagpipes.configuration.YAMLParser
 
-object BagPipesRun extends App {
+object BagPipesRun {
   //pass some of these as arguments or in the yaml descriptor
   //Also, make explorer and executor parameters
-  override def main(args: Array[String]): Unit = {
+  def run(args: Array[String]): Unit = {
     val controller = SimpleUimaExecutionController
     val parser = YAMLParser
     //get configuration descriptor path

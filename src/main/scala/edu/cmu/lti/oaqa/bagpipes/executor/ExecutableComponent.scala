@@ -3,6 +3,7 @@ package edu.cmu.lti.oaqa.bagpipes.executor
 import edu.cmu.lti.oaqa.bagpipes.configuration.AbstractDescriptors._
 import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.CollectionReaderDescriptor
 import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.EvaluatorDescriptor
+import edu.cmu.lti.oaqa.bagpipes.annotation.Analytic
 
 abstract trait Reader[I] {
   //def hasNext() : Boolean

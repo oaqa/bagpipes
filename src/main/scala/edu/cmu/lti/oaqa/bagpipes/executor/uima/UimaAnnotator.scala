@@ -32,7 +32,7 @@ final class UimaAnnotator(compDesc: ComponentDescriptor) extends UimaComponent(c
    * @param input
    * 	The JCas to process
    * @return A process copy of the input JCas
-   */
+   */ 
   override def executeComponent(input: Result[JCas]): Result[JCas] = {
     val result @ Result(cas) = input
     ae.process(cas.getCas())

@@ -2,10 +2,8 @@ package edu.cmu.lti.oaqa.bagpipes.annotation
 
 import edu.cmu.lti.oaqa.bagpipes.db.BagpipesDatabase.Metric
 
-trait AnalysisType
-
 case class QAAnalytic(qaSets: List[AnalysisQASet] = Nil, neList: List[NamedEntity] = Nil,
-  candSents: List[AnalysisCandidateSentence] = Nil, metrics: List[AnalysisMetric] = Nil) extends AnalysisType
+  candSents: List[AnalysisCandidateSentence] = Nil, metrics: List[AnalysisMetric] = Nil) extends Analytic(metrics)
 
 sealed abstract class Annotation[T <: Annotation[T]](begin: Int, end: Int, text: String) extends AnalysisType {
   def getBegin = begin
@@ -27,7 +25,6 @@ object Annotation {
 case class Evaluations[T <: Annotation[T]](map: Map[AnalysisQASet, (List[T], List[T], Double)])
 //case class Evaluation[T <: Annotation[T]](candList: List[T], testList: List[T])
 
-case class AnalysisMetric(name: String, score: Double)
 
 case class AnalysisDocument(begin: Int, end: Int, text: String, id: String,
   filteredText: String, sentList: List[AnalysisSentence])

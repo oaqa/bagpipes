@@ -40,6 +40,13 @@ pipeline:
     val ex8 = ex0 + """
 pipeline:
   - inherit: evaluators.crossNGram"""
+    
+    val ex9 = ex0 + """
+pipeline:
+  - inherit: components.dummyComponent
+    params:
+        param_b: bar
+    """
   }
 
   trait progConfigs {
@@ -58,13 +65,14 @@ pipeline:
     val patterns = List("\\b[0-4]\\d[0-2]\\d\\d\\b")
 
     val roomannotator2Params = Map[String, Parameter]("Locations" -> locations, "Patterns" -> patterns)
-
+    
+    val flattenedParams = Map[String,Parameter]("param_a"-> "foo", "param_b"-> "bar")
     //annotators 
     //Ex1: RoomNumberAnnotator: 
     val roomAnnotator1 = SimpleComponentDescriptor(getPath(1, "RoomNumberAnnotator")) //, testParams)
     //Ex2: RoomNumberAnnotator
     val roomAnnotator2 = SimpleComponentDescriptor(getPath(2, "RoomNumberAnnotator"), roomannotator2Params)
-
+ 
     val simpleDateTimeAnnotator = SimpleComponentDescriptor(getPath(3, "SimpleTutorialDateTime"), testParams)
     val dateTimeAnnotator = SimpleComponentDescriptor(getPath(3, "TutorialDateTime"), testParams)
 
@@ -77,7 +85,8 @@ pipeline:
       crossParams1.foldLeft(Map[String, ListParameter]())((x, y) => x ++ Map((y._1, ListParameter(y._2.map(primitive2Parameter))))))
     //expanded cross-opted configured descriptors (i.e., the result of expanding these annotators)  
     val expandedCrossOptAnnotators1: List[SimpleComponentDescriptor] = for (param <- expandCrossOpts(crossParams1)) yield SimpleComponentDescriptor("components.CrossOpted", testParams ++ param)
-
+     
+    val flattenedComponent = SimpleComponentDescriptor("edu.cmu.lti.oaqa.bagpipes.components.dummy",flattenedParams)
     //evaluators
     val evalParams = Map("n" -> IntegerParameter(3))
     val eval1 = EvaluatorDescriptor("default", evalParams)
@@ -97,6 +106,8 @@ pipeline:
     val confEx6 = ConfigurationDescriptor(config, collectionReader, phase4 :: Nil) // List(roomAnnotator1))
     val confEx7 = ConfigurationDescriptor(config, collectionReader, roomAnnotator1 :: eval1 :: Nil) // List(crossOptedAnnotator))
     val confEx8 = ConfigurationDescriptor(config, collectionReader, crossEvaluator1 :: Nil)
+    val confEx9 = ConfigurationDescriptor(config, collectionReader, flattenedComponent :: Nil)
+  
   }
   //convenience methods:
   // get file path from common classpath of the uima tutorial example directory

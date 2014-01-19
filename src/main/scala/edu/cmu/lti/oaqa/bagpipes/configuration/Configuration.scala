@@ -86,6 +86,8 @@ object AbstractDescriptors {
         yield getComponent(`class`, params ++ cParams)
     }
   }
+  
+  
 
   abstract sealed class ComponentDescriptor(`class`: String, params: Map[String, Parameter] = Map()) extends AtomicExecutableConf(`class`, params) {
     // need to expiicitly declare constructors with default arguments to make lift-json extraction happy
