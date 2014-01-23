@@ -21,9 +21,11 @@ import edu.cmu.lti.oaqa.bagpipes.CommonTesting._
 
 @RunWith(classOf[JUnitRunner])
 class ConfigurationParserSpec extends FeatureSpec {
-  val parser: Parser = YAMLParser
+  val parser: Parser = YAMLParser(Some("src/test/resources")) 
   feature("parse yamls") {
     new yamls with progConfigs {
+      val baseDir = "src/test/resources"
+      
       scenario("ex0: collection-reader with inherits") {
         val parsedEx0 = parser.parse(ex0)
         assert(confEx0 === parsedEx0)
@@ -71,6 +73,8 @@ class ConfigurationParserSpec extends FeatureSpec {
         val parsedEx9 = parser.parse(ex9)
         assert(confEx9 === parsedEx9)
       }
+       
+  
     }
   }
 }

@@ -10,7 +10,7 @@ import breeze.stats.distributions._
 import edu.cmu.lti.oaqa.bagpipes.cmd._
 
 
-object cmdTest {;import org.scalaide.worksheet.runtime.library.WorksheetSupport._; def main(args: Array[String])=$execute{;$skip(2282); 
+object cmdTest {;import org.scalaide.worksheet.runtime.library.WorksheetSupport._; def main(args: Array[String])=$execute{;$skip(2283); 
   /**
    *
    * bp -n author=mog -p c1=dummy > test.yaml
@@ -41,7 +41,7 @@ object cmdTest {;import org.scalaide.worksheet.runtime.library.WorksheetSupport.
    * conflicts
    * etc.
    */
-
+ 
   // parse(Array("--help"))
   //parse(Array("--version"))
   //parse(Array("init"))
@@ -49,8 +49,8 @@ object cmdTest {;import org.scalaide.worksheet.runtime.library.WorksheetSupport.
   //parse(Array("init", "-a", "mog", "-n", "test", "--collection-reader", "dummies.dummyReader"))
   val parser = CmdParser;System.out.println("""parser  : edu.cmu.lti.oaqa.bagpipes.cmd.CmdParser.type = """ + $show(parser ));$skip(31); 
 
-  parser.parse(Array("init"));$skip(43); 
-  
+  parser.parse(Array("init"));$skip(44); 
+   
   parser.parse(Array("pl", "-n")): Unit;$skip(42); 
   parser.parse(Array("init", "pl", "-n"));$skip(42); 
   parser.parse(Array("init", "pl", "-n"));$skip(130); 
@@ -63,6 +63,7 @@ object cmdTest {;import org.scalaide.worksheet.runtime.library.WorksheetSupport.
   parser.parse(Array("pl", "-np", "testPhase", "--cross", "dummies.dummyReader", "-X", "foo"));$skip(177); 
   // parse(Array("viz","--flat"))
   //parse(Array("create", "--class", "dummy"))
-  parser.parse(Array("create", "--class", "dummy", "-Pp1=32", "p2=43", "p3=aaaa", "p4=12.324"))}
+  parser.parse(Array("create", "--class", "dummy", "-Pp1=32", "p2=43", "p3=aaaa", "p4=12.324"));$skip(41); 
+  parser.parse(Array("exec","test-run"))}
 
 }

@@ -20,7 +20,7 @@ import net.liftweb.json.TypeHints
 object ParserUtils {
 
   /**
-   * Returns a new [[scala.collections.Map]] from combining the maps shared by
+   * Returns a new [[scala.Map]] from combining the maps shared by
    * a common key in `map1` and `map2`.
    *
    * For example,
@@ -64,7 +64,7 @@ object ParserUtils {
 
   def extract[C](configMap: Map[String, Any])(implicit m: Manifest[C]): C = {
     //Serialize to JSON
-    //scala.collections.map->JSONObject
+    //scala.Map->JSONObject
     //implicit value "formats" is used in decomposition of map into JSONObject.
     val jsonObjConf = decompose(configMap)
 
@@ -78,10 +78,10 @@ object ParserUtils {
    * with the child map. If there is a namespace collision between the child and
    * the parent properties, the child will override the parent.
    *
-   * @return a new [[scala.collections.Map]] with all the parent properties merged
+   * @return a new [[scala.Map]] with all the parent properties merged
    * with the child properties.
-   * @param child the child [[scala.collections.Map]]
-   * @param parent the parent [[scala.collections.Map]]
+   * @param child the child [[scala.Map]]
+   * @param parent the parent [[scala.Map]]
    * @param properties the list of properties to be merged
    * @see `joinMaps`
    */
@@ -96,9 +96,11 @@ object ParserUtils {
    * @param in the file specified
    */
 
-  def loadFileContent(in: String): String = {
-    println("getFile: " + in)
-    val contents = fromInputStream(getClass.getResourceAsStream(in)).mkString
+  def loadFileContent(in: String, baseDir:String=""): String = {
+    println("getFile: " + baseDir + in)
+    val contents =
+      scala.io.Source.fromFile(baseDir + in).mkString //from filesystem 
+      //fromInputStream(getClass.getResourceAsStream(in)).mkString //from classpath
     println("contents: " + contents)
     contents
   }

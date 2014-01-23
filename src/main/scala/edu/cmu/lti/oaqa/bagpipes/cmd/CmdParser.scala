@@ -8,9 +8,10 @@ import org.yaml.snakeyaml.DumperOptions
 import org.rogach.scallop.ScallopOption
 import org.rogach.scallop.exceptions._
 import breeze.stats.distributions._
-import com.github.mdr.ascii.layout._
-import com.github.mdr.ascii.graph.Graph
-import com.github.mdr.ascii.layout.coordAssign.Layouter
+//import com.github.mdr.ascii.layout._
+//import com.github.mdr.ascii.graph.Graph
+//import com.github.mdr.ascii.layout.coordAssign.Layouter
+import edu.cmu.lti.oaqa.bagpipes.run.BagPipesRun
 object CmdParser extends App {
   import Parser._
   /**
@@ -48,23 +49,28 @@ object CmdParser extends App {
   }
 
   def parse(args: Array[String]) = {
-    val conf = new BPConf(args)
+    val command = new BPConf(args)
     //val phase = Map()
     //parse commands
 
-    val groupedCmds = conf.subcommands.groupBy(isYamlCmd(conf, _))
-    val yamlCmds = groupedCmds(true)
-    val otherCmds = groupedCmds(false)
+    val groupedCmds = command.subcommands.groupBy(isYamlCmd(command, _))
+    val yamlCmds = if (groupedCmds.keySet.contains(true)) groupedCmds(true) else Nil
+    val otherCmds = if (groupedCmds.keySet.contains(false)) Some(groupedCmds(false).head) else None
 
-    val config = parseYamlCmds(conf)
     //output yaml
-    if (!yamlCmds.isEmpty && !conf.quiet.isSupplied) {
+
+    val descriptor = if (!yamlCmds.isEmpty && !command.quiet.isSupplied) {
+      val descriptor = parseYamlCmds(command, yamlCmds)
       val options = new DumperOptions()
       options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK)
       val yaml = new Yaml(options)
-      val out = yaml.dump(config.asJava)
+      val out = yaml.dump(descriptor.asJava)
       println(out)
-    }
+      Some(descriptor)
+    } else None
+
+    if (otherCmds != None)
+      parseExecCmds(command, otherCmds.get, descriptor)
 
   }
 
@@ -100,7 +106,7 @@ object CmdParser extends App {
     // Two approaches:
     // (1) read in file into a map and nest the statement in the selected phase
     // (2) if "append" is selected 
-    sealed class BPConf(args: Array[String]) extends ScallopConf(args.toList) {
+    sealed class BPConf(args: Array[String]) extends ScallopConf(args) {
       version("BagPipes 0.0.1 (c) 2014 Avner Maiberg (amaiberg@cs.cmu.edu)")
       banner("""Usage: bp [OPTION]... |init|pl|create|+ |OPTION|...
            |bp generates, manages, and executes pipeline descriptors using the BagPipes framework.      
@@ -157,7 +163,12 @@ object CmdParser extends App {
         val cr = opt[String]("collection-reader", descr = "specifies the collection reader", required = false, default = Some("collection_reader.filesystem-collection-reader"))
         val pipeline = new PipelineCmd(true)
       }
-      /*TODO: Maybe use the java libs for grpahviz (Grappa)
+
+      val exec = new Subcommand("exec") {
+        val conf = trailArg[String]("descriptor")
+        //BagPipesRun.
+      }
+      /*TODO: Maybe use the java libs for grpahviz 
       val viz = new Subcommand("viz") {
         val flat = toggle("flat")
       }
@@ -173,14 +184,16 @@ object CmdParser extends App {
 
     }
 
-    def parseExecCmds(command: BPConf) = {
-
+    def parseExecCmds(command: BPConf, subcommand: ScallopConf, descriptor: Option[Map[String, Any]] = None) = {
+      (subcommand, descriptor) match {
+        case (execCmd @ command.exec, None) => BagPipesRun.run(execCmd.conf())
+        case (execCmd @ command.exec, Some(desc)) => ???
+        case _ => command.printHelp
+      }
     }
 
-    def parseYamlCmds(command: BPConf) =
-      if (!command.subcommands.isEmpty)
-        command.subcommands.map(subCmd => parseYamlCmd(command, subCmd)).reduce(_ ++ _)
-      else Map()
+    def parseYamlCmds(command: BPConf, subcommands: List[ScallopConf]) =
+      subcommands.map(subCmd => parseYamlCmd(command, subCmd)).reduce(_ ++ _)
 
     def parseYamlCmd(command: BPConf, subCmd: ScallopConf): Map[String, Any] =
       subCmd match {

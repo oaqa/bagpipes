@@ -15,13 +15,11 @@ import edu.cmu.lti.oaqa.bagpipes.configuration.YAMLParser
 object BagPipesRun {
   //pass some of these as arguments or in the yaml descriptor
   //Also, make explorer and executor parameters
-  def run(args: Array[String]): Unit = {
+  def run(descPath: String, baseDir: Option[String] = None, fromFile: Boolean = true): Unit = {
     val controller = SimpleUimaExecutionController
-    val parser = YAMLParser
-    //get configuration descriptor path
-    val path = args.head
+    val parser = YAMLParser(baseDir)
     //parse to ConfigurationDescriptor object
-    val confDesc = parser.parse(path, true)
+    val confDesc = parser.parse(descPath, fromFile)
     //ConfigurationDescriptor -> ConfigurationSpace
     val spaceTree = ConfigurationSpace(confDesc).getSpace
     //execute pipeline

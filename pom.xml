@@ -85,6 +85,20 @@
 			<version>1.0.1</version>
 		</dependency>
 		<dependency>
+			<groupId>org.rogach</groupId>
+			<artifactId>scallop_2.10</artifactId>
+			<version>0.9.4</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.scalanlp</groupId>
+			<artifactId>breeze-math_2.10</artifactId>
+			<version>0.4</version>
+		</dependency>
+ 
+
+		<dependency>
 			<groupId>com.typesafe</groupId>
 			<artifactId>scalalogging-log4j_2.10</artifactId>
 			<version>1.0.1</version>

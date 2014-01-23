@@ -13,7 +13,7 @@ import scala.collection.JavaConverters._
  * @author Avner Maiberg (amaiberg@cs.cmu.edu)
  */
 
-object YAMLParser extends Parser {
+class YAMLParser(baseDir: Option[String] = None) extends Parser(baseDir) {
 
   /**
    * Returns a [[scala.collections.Map]] representation of a Yaml configuration
@@ -24,7 +24,7 @@ object YAMLParser extends Parser {
    *
    * @param file path of the yaml configuration descriptor.
    */
-  def getConfigurationMap(res: String): Map[String, Any] =
+  override def getConfigurationMap(res: String): Map[String, Any] =
     new Yaml().load(res).asInstanceOf[java.util.Map[String, Any]]
 
   /**
@@ -35,8 +35,13 @@ object YAMLParser extends Parser {
    */
 
   override def getConfigurationMapFromFile(path: String): Map[String, Any] = {
-    val classpath = path + ".yaml"
+    val classpath = { if (baseDir != None) baseDir.get + "/" else "" } + path + ".yaml"
     val content = loadFileContent(classpath)
     getConfigurationMap(content)
   }
+
+}
+
+object YAMLParser {
+  def apply(baseDir: Option[String] = None) = new YAMLParser(baseDir)
 }
