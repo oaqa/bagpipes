@@ -15,3 +15,32 @@ configuration space.
 
 This module is part of the Open Advancement of Question Answering
 ([OAQA](https://mu.lti.cs.cmu.edu/trac/oaqa2.0)) project.
+
+# Quickstart
+BagPipes can be included as a library dependency or executed as standalone project. 
+## For Developers
+
+### As a command-line tool:
+
+#### Generating a configuration
+
+#### Executing
+
+### As a dependency
+To include BagPipes as a maven dependency, (for now) clone it to your local machine and add this to your `pom.xml`:
+
+```xml
+<dependency>
+	<groupId> edu.cmu.lti.oaqa </groupId>
+	<artifactId>bagpipes</artifactId>
+	<version> 0.0.1 </version>
+</dependency>
+```
+
+To use within a Java or Scala application use this API call to execute an arbitrary YAML configuration:
+
+```java
+BagPipesRun.run(myYaml);
+```
+
+## For Users
