@@ -75,9 +75,9 @@ bagpipes exec myDesc
 
 For example, to execute the configuration above, you can run:
 
-1. `bagpipes init pl -n --collection-reader "collection_reader.filesystem-collection-reader"--component "tutorial.ex1.RoomNumberAnnotator" Pp1=foo p2=bar` > myDesc.yaml
+1. `bagpipes init pl -n --collection-reader "collection_reader.filesystem-collection-reader"--component "tutorial.ex1.RoomNumberAnnotator" Pp1=foo p2=bar > myDesc.yaml`
 
-2. `bagpipes exec myYaml`  
+2. `bagpipes exec myDesc`  
 
 ### As a dependency
 To include BagPipes as a maven dependency, (for now) clone it to your local machine and add this to your `pom.xml`:
