@@ -27,7 +27,7 @@ The bagpipes command-line tool can be used to generate and execute yaml componen
 2. Go to the root directory of the project. 
 3. Run `sbt stage`. This will generate the command-line executable at /path/to/bagpipes/target/universal/stage/bin/
 
-For a full tutorial on how to generate/run configurations or setup as part of an external project, go [here](link.to.full.tutorial) or run `bagpipes --help` to view more options. 
+For a full tutorial on how to generate/run configurations or setup as part of an external project, go [here](https://github.com/oaqa/bagpipes/wiki/Command-Line-HOWTO) or run `bagpipes --help` to view more options. 
 #### Generating a configuration
 To generate the most basic configuration (name, author, and collection-reader):
 
