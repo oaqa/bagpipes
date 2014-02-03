@@ -48,7 +48,7 @@ collection-reader:
 BagPipes comes with built-in components based on the [UIMA tutorial](http://uima.apache.org/downloads/releaseDocs/2.1.0-incubating/docs/html/tutorials_and_users_guides/tutorials_and_users_guides.html). To generate the most basic RoomAnnotator pipeline configuration run:
 
 ```bash
-bagpipes init pl -n --collection-reader "collection_reader.filesystem-collection-reader"  --component "tutorial.ex1.RoomNumberAnnotator" Pp1=foo p2=bar 
+bagpipes init pl -n --collection-reader "collection_reader.filesystem-collection-reader" --component "tutorial.ex1.RoomNumberAnnotator" Pp1=foo p2=bar 
 ``` 
 
 This will result in the following configuration:
@@ -75,7 +75,7 @@ bagpipes exec myDesc
 
 For example, to execute the configuration above, you can run:
 
-1. `bagpipes init pl -n --collection-reader "collection_reader.filesystem-collection-reader"--component "tutorial.ex1.RoomNumberAnnotator" Pp1=foo p2=bar > myDesc.yaml`
+1. `bagpipes init pl -n --collection-reader "collection_reader.filesystem-collection-reader" --component "tutorial.ex1.RoomNumberAnnotator" Pp1=foo p2=bar > myDesc.yaml`
 
 2. `bagpipes exec myDesc`  
 
