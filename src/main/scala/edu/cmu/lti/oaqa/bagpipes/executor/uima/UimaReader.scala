@@ -7,6 +7,7 @@ import edu.cmu.lti.oaqa.bagpipes.executor.Reader
 import org.apache.uima.collection.CollectionReader
 import org.apache.uima.fit.factory.JCasFactory
 import org.apache.uima.util.CasCopier
+import edu.cmu.lti.oaqa.bagpipes.executor.Result
 /**
  * Instantiate and use any arbitrary UIMA Collection Reader to feed a pipeline.
  *
@@ -34,7 +35,11 @@ final class UimaReader(readerDesc: CollectionReaderDescriptor) extends UimaCompo
    * 	The JCas to populate with the next input item
    * @return true if there was another item use, false otherwise
    */
-  override def executeComponent(input: JCas): Unit = collReader.getNext(input.getCas())
+  override def executeComponent(input: Result[JCas]): Result[JCas] = {
+    val result @ Result(cas) = input
+    collReader.getNext(cas.getCas())
+    result
+  }
 
   //override def getNext(emptyInput: JCas) = collReader.getNext(emptyInput.getCas)
 

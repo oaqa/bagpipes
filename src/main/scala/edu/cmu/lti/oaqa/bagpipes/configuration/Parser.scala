@@ -1,5 +1,4 @@
 package edu.cmu.lti.oaqa.bagpipes.configuration
-
 import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors._
 import net.liftweb.json.JsonAST.JValue
 import net.liftweb.json.DefaultFormats
@@ -24,14 +23,14 @@ import net.liftweb.json.TypeHints
  *
  * Briefly, parsing configuration descriptors can be visualized as the following \
  * flowchart:
- * (configuration descriptor)->[[java.util.Map]]->[[scala.collections.Map]]->
- * (flattened+converted to Parameters)[[scala.collections.Map]]->[[$confDes]]
+ * (configuration descriptor)->[[java.util.Map]]->[[scala.Map]]->
+ * (flattened+converted to Parameters)[[scala.Map]]->[[$confDes]]
  * <p>
  * In more detail:
  * 1. Converts descriptor to [[java.util.Map]] using concrete implementation
  * (e.g., [[$packagePath.YAMLParser]]).
  * <p>
- * 2. Implicitly converts [[java.util.Map]] to [[scala.collections.Map]] using
+ * 2. Implicitly converts [[java.util.Map]] to [[scala.Map]] using
  * `deepMapAsScalaConverter` and `deepListAsScalaConverter` that recursively convert
  * all the contents of the [[java.util.Map]] to Scala classes.
  * <p>
@@ -58,7 +57,7 @@ import net.liftweb.json.TypeHints
  * Primitive types are also converted to their corresponding
  * [[$packagePath.ConfigurationDescriptors.Parameter]] types.
  * <p>
- * 4. Converts [[scala.collections.Map]] to [[scala.util.parsing.json.JSONObject]].
+ * 4. Converts [[scala.Map]] to [[scala.util.parsing.json.JSONObject]].
  * <p>
  * 5. Extracts [[$packagePath.ConfigurationDescriptors.ConfigurationDescriptor]]
  * from [[scala.util.parsing.json.JSONObject]] using the `extract` method defined
@@ -73,17 +72,20 @@ import net.liftweb.json.TypeHints
  * @author Avner Maiberg (amaiberg@cs.cmu.edu)
  */
 
-trait Parser {
+abstract class Parser(baseDir: Option[String] = None) {
 
   /**Returns a new [[$confDes]] from parsed contents of a configuration descriptor */
-  def parse(resource: String): ConfigurationDescriptor = {
-    //YAML->java.util.map->scala.collections.Map
-    val resMap = getConfigurationMap(resource)
+  def parse(resource: String, fromFile: Boolean = false): ConfigurationDescriptor = {
+    //YAML->java.util.map->scala.Map
+    val resMap = fromFile match {
+      case false => getConfigurationMap(resource)
+      case true => getConfigurationMapFromPath(resource)
+    }
     parse(resMap)
   }
 
   /**
-   *  Returns a new [[$confDes]] from a parsed [[scala.collections.Map]].
+   *  Returns a new [[$confDes]] from a parsed [[scala.Map]].
    *
    *  First, the parser "flattens" the map, merging parameters of inheriting components
    *  with their parents, and converting to [[$pacakgePath.ConfigurationDescriptor.Parameter]]
@@ -96,7 +98,7 @@ trait Parser {
    */
   private def parse(resMap: Map[String, Any]): ConfigurationDescriptor = {
     //flatten and convert configuration maps to configuration maps with parameters 
-    //scala.collections.Map->(flattened+converted to parameters)scala.collections.Map
+    //scala.Map->(flattened+converted to parameters)scala.Map
     val configMap = flattenConfMap(resMap)
     //helpful for debugging
     println("configMap: " + configMap)
@@ -104,29 +106,29 @@ trait Parser {
   }
 
   /**
-   * Returns a [[scala.util.Map]] representation of a configuration. Reformats
+   * Returns a [[scala.Map]] representation of a configuration. Reformats
    * file path String to classpath resource style from standard Java package style
    * (e.g.,`edu.cmu.lti.oaqa.cse.configuration` -> `/edu/cmu/lti/oaqa/cse/configuration`).
    *
    * @param path the file path of the configuration descriptor.
-   * @return [[scala.util.Map]] representation of the configuration descriptor.
+   * @return [[scala.Map]] representation of the configuration descriptor.
    */
-  protected def getConfigurationMapFromPath(path: String): Map[String, Any] = getConfigurationMapFromFile("/" + path.replace(".", "/"))
+  protected def getConfigurationMapFromPath(path: String): Map[String, Any] = getConfigurationMapFromFile(path.replace(".", "/"))
 
   /**
-   * Returns a new [[scala.util.Map]] representation of a configuration from the
+   * Returns a new [[scala.Map]] representation of a configuration from the
    * configuration descriptor contents. Hook method for concrete implementation
    * (e.g., @see [[$packagePath.YAMLParser]].
    */
   protected def getConfigurationMap(resource: String): Map[String, Any]
   /**
-   * Returns a new [[scala.util.Map]] representation of a configuration. Hook method
+   * Returns a new [[scala.Map]] representation of a configuration. Hook method
    * for concrete implementation (e.g., @see [[$packagePath.YAMLParser]].
    */
   protected def getConfigurationMapFromFile(path: String): Map[String, Any]
   /**Returns a new [[$confDes]] from file path of a configuration descriptor */
   def parseFromFile(path: String) = {
-    //YAML (filepath)->java.util.map->scala.collections.Map
+    //YAML (filepath)->java.util.map->scala.Map
     val resMap = getConfigurationMapFromFile(path)
     parse(resMap)
   }
@@ -135,8 +137,8 @@ trait Parser {
    * Returns a new map from the "flattened," and effective version of the
    * `confMap` where all "inherited" components are substituted by concrete
    * class definitions and parameters are merged. Also, recursively applies
-   * `flattenComponent` to any [[scala.collections.Map]] that have an `inherit`
-   * key, `flattenMap` to any [[scala.collections.Map]], and `flattenList`
+   * `flattenComponent` to any [[scala.Map]] that have an `inherit`
+   * key, `flattenMap` to any [[scala.Map]], and `flattenList`
    * to any [[scala.collections.List]] contained in `confMap`.
    *
    * @param  confMap a map representation of the configuration descriptor
@@ -152,8 +154,8 @@ trait Parser {
   /**
    * Returns a new map from the "flattened," and effective version of
    * the `confList` where all "inherited" components are substituted
-   * by concrete class definitions and parameters are merged. Also, recursively applies
-   * `flattenMap` to any [[scala.collections.Map]], and `flattenList`
+   * by concrete class definit`ions and parameters are merged. Also, recursively applies
+   * `flattenMap` to any [[scala.Map]], and `flattenList`
    * to any [[scala.collections.List]] contained in `confMap`.
    *
    * @param  confMap a map representation of the configuration descriptor
@@ -182,15 +184,24 @@ trait Parser {
     }
     // case ("collection-reader", v: String) => extract[CollectionReaderDescriptor](flattenComponent(confMap,v))
     //else just recursively flatten the map
+
+    case ("phase", v: String) => {
+      extract[PhaseDescriptor](flattenConfMap(confMap))
+    }
+
     case _ => flattenConfMap(confMap)
   }
-
+  //DISAMBIGUATE executable components
+  //must do so explicitly because lift.json cannot handle polymorphism in all cases
   def extractComponent(confMap: Map[String, Any]) =
     if (confMap.contains("collection-class")) extract[CollectionReaderDescriptor](confMap)
+    else if (confMap.contains("cross-opts") && confMap.contains("evaluator"))
+      extract[CrossEvaluatorDescriptor](confMap)
     else if (confMap.contains("cross-opts"))
-      extract[CrossComponentDescriptor](confMap)
-    else if (confMap.contains("params")) extract[ComponentDescriptor](confMap)
-    else confMap
+      extract[CrossSimpleComponentDescriptor](confMap)
+    else if (confMap.contains("evaluator")) extract[EvaluatorDescriptor](confMap)
+    else if (confMap.contains("class")) extract[SimpleComponentDescriptor](confMap)
+    else flattenConfMap(confMap)
 
   /**
    * Returns "flattened," effective version of the component where all "inherits" are

@@ -53,7 +53,7 @@ class ConfigurationSpaceSpec extends FeatureSpec {
 
     feature("test cross-opted components") {
       scenario("collection reader + 1 phase with 2 crossoptions (3 params + 2 params, expanded)") {
-        val testTree5 = ConfigurationSpace(confEx5).getSpace
+        val testTree5 = ConfigurationSpace(confEx6).getSpace
         assert(testTree5 === confTree5)
       }
       

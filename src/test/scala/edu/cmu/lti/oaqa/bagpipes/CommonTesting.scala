@@ -1,6 +1,7 @@
 package edu.cmu.lti.oaqa.bagpipes
-import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors._
 import edu.cmu.lti.oaqa.bagpipes.configuration.Parameters._
+import edu.cmu.lti.oaqa.bagpipes.configuration.AbstractDescriptors._
+import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors._
 
 object CommonTesting {
   trait yamls {
@@ -27,12 +28,25 @@ pipeline:
     val ex4 = ex2 + exPhase2
     val ex5 = ex0 + """
 pipeline:
-  inherit: tutorial.ex1.RoomNumberAnnotator"""
+  - inherit: tutorial.ex1.RoomNumberAnnotator"""
     val ex6 = ex0 + """
 pipeline:
   - phase: CrossOpted
     options: 
       - inherit: components.crossOpted"""
+    val ex7 = ex5 + """
+  - inherit: evaluators.ngramEval"""
+
+    val ex8 = ex0 + """
+pipeline:
+  - inherit: evaluators.crossNGram"""
+    
+    val ex9 = ex0 + """
+pipeline:
+  - inherit: components.dummyComponent
+    params:
+        param_b: bar
+    """
   }
 
   trait progConfigs {
@@ -51,24 +65,31 @@ pipeline:
     val patterns = List("\\b[0-4]\\d[0-2]\\d\\d\\b")
 
     val roomannotator2Params = Map[String, Parameter]("Locations" -> locations, "Patterns" -> patterns)
-
-    //annotators
+    
+    val flattenedParams = Map[String,Parameter]("param_a"-> "foo", "param_b"-> "bar")
+    //annotators 
     //Ex1: RoomNumberAnnotator: 
-    val roomAnnotator1 = ComponentDescriptor(getPath(1, "RoomNumberAnnotator"), testParams)
+    val roomAnnotator1 = SimpleComponentDescriptor(getPath(1, "RoomNumberAnnotator")) //, testParams)
     //Ex2: RoomNumberAnnotator
-    val roomAnnotator2 = ComponentDescriptor(getPath(2, "RoomNumberAnnotator"), roomannotator2Params)
-
-    val simpleDateTimeAnnotator = ComponentDescriptor(getPath(3, "SimpleTutorialDateTime"), testParams)
-    val dateTimeAnnotator = ComponentDescriptor(getPath(3, "TutorialDateTime"), testParams)
+    val roomAnnotator2 = SimpleComponentDescriptor(getPath(2, "RoomNumberAnnotator"), roomannotator2Params)
+ 
+    val simpleDateTimeAnnotator = SimpleComponentDescriptor(getPath(3, "SimpleTutorialDateTime"), testParams)
+    val dateTimeAnnotator = SimpleComponentDescriptor(getPath(3, "TutorialDateTime"), testParams)
 
     val crossParams1: List[CrossOptParam] = ("opt1", List("a", "b", "c")) :: ("opt2", List(1, 2)) :: Nil
+    val crossParams2 = Map("n" -> ListParameter(IntegerParameter(1) :: IntegerParameter(2) :: IntegerParameter(3) :: Nil))
     //cross-opts descriptor
-    val crossOptAnnotator1 = CrossComponentDescriptor("components.CrossOpted", testParams,
+    val crossEvaluator1 = CrossEvaluatorDescriptor("default", Map(), crossParams2)
+    val crossOptAnnotator1 = CrossSimpleComponentDescriptor("components.CrossOpted", testParams,
       // convert list of tuples to map. (Note: seems verbose, maybe there is a nicer idiom for this).
       crossParams1.foldLeft(Map[String, ListParameter]())((x, y) => x ++ Map((y._1, ListParameter(y._2.map(primitive2Parameter))))))
     //expanded cross-opted configured descriptors (i.e., the result of expanding these annotators)  
-    val expandedCrossOptAnnotators1: List[ComponentDescriptor] = for (param <- expandCrossOpts(crossParams1)) yield ComponentDescriptor("components.CrossOpted", testParams ++ param)
-
+    val expandedCrossOptAnnotators1: List[SimpleComponentDescriptor] = for (param <- expandCrossOpts(crossParams1)) yield SimpleComponentDescriptor("components.CrossOpted", testParams ++ param)
+     
+    val flattenedComponent = SimpleComponentDescriptor("edu.cmu.lti.oaqa.bagpipes.components.dummy",flattenedParams)
+    //evaluators
+    val evalParams = Map("n" -> IntegerParameter(3))
+    val eval1 = EvaluatorDescriptor("default", evalParams)
     //phases
     val phase1 = PhaseDescriptor("RoomNumberAnnotators", List(roomAnnotator1))
     val phase2 = PhaseDescriptor("RoomNumberAnnotators", List(roomAnnotator1, roomAnnotator2))
@@ -81,8 +102,12 @@ pipeline:
     val confEx2 = ConfigurationDescriptor(config, collectionReader, phase2 :: Nil)
     val confEx3 = ConfigurationDescriptor(config, collectionReader, phase1 :: phase3 :: Nil)
     val confEx4 = ConfigurationDescriptor(config, collectionReader, phase2 :: phase3 :: Nil)
-    val confEx5 = ConfigurationDescriptor(config, collectionReader, phase4 :: Nil) // List(roomAnnotator1))
-    val confEx6 = ConfigurationDescriptor(config, collectionReader, phase4Expanded :: Nil) // List(crossOptedAnnotator))
+    val confEx5 = ConfigurationDescriptor(config, collectionReader, roomAnnotator1 :: Nil)
+    val confEx6 = ConfigurationDescriptor(config, collectionReader, phase4 :: Nil) // List(roomAnnotator1))
+    val confEx7 = ConfigurationDescriptor(config, collectionReader, roomAnnotator1 :: eval1 :: Nil) // List(crossOptedAnnotator))
+    val confEx8 = ConfigurationDescriptor(config, collectionReader, crossEvaluator1 :: Nil)
+    val confEx9 = ConfigurationDescriptor(config, collectionReader, flattenedComponent :: Nil)
+  
   }
   //convenience methods:
   // get file path from common classpath of the uima tutorial example directory

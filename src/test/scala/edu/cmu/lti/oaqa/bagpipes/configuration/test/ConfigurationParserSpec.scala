@@ -21,9 +21,11 @@ import edu.cmu.lti.oaqa.bagpipes.CommonTesting._
 
 @RunWith(classOf[JUnitRunner])
 class ConfigurationParserSpec extends FeatureSpec {
-  val parser: Parser = YAMLParser
+  val parser: Parser = YAMLParser(Some("src/test/resources")) 
   feature("parse yamls") {
     new yamls with progConfigs {
+      val baseDir = "src/test/resources"
+      
       scenario("ex0: collection-reader with inherits") {
         val parsedEx0 = parser.parse(ex0)
         assert(confEx0 === parsedEx0)
@@ -46,11 +48,33 @@ class ConfigurationParserSpec extends FeatureSpec {
         val parsedEx4 = parser.parse(ex4)
         assert(confEx4 === parsedEx4)
       }
-      
-      scenario("ex5: collection-reader + component with cross-opts") {
-        val parsedEx5 = parser.parse(ex6)
+
+      scenario("ex5: collection-reader + single standalone component") {
+        val parsedEx5 = parser.parse(ex5)
         assert(confEx5 === parsedEx5)
       }
+
+      scenario("ex6: collection-reader + component with cross-opts") {
+        val parsedEx6 = parser.parse(ex6)
+        assert(confEx6 === parsedEx6)
+      }
+
+      scenario("ex7: collection-reader + single standalone component + evaluator") {
+        val parsedEx7 = parser.parse(ex7)
+        assert(confEx7 === parsedEx7)
+      }
+
+      scenario("ex8: collection-reader + cross-evaluator") {
+        val parsedEx8 = parser.parse(ex8)
+        assert(confEx8 === parsedEx8)
+      }
+
+      scenario("ex9: flattened configuration from inherited component") {
+        val parsedEx9 = parser.parse(ex9)
+        assert(confEx9 === parsedEx9)
+      }
+       
+  
     }
   }
 }

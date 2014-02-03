@@ -1,2 +1,3 @@
 classpath*:types/TutorialTypeSystem.xml
 classpath*:types/SourceDocumentInformation.xml
+classpath*:TypeSystemDescriptor.xml

@@ -4,18 +4,19 @@ import org.apache.uima.jcas.JCas
 import org.apache.uima.util.CasCopier
 import org.apache.uima.fit.factory.AnalysisEngineFactory
 import org.apache.uima.fit.factory.JCasFactory
-import edu.cmu.lti.oaqa.bagpipes.configuration.Descriptors.ComponentDescriptor
+import edu.cmu.lti.oaqa.bagpipes.configuration.AbstractDescriptors._
 import UimaAnnotator._
 import edu.cmu.lti.oaqa.bagpipes.executor.Annotator
 import edu.cmu.lti.oaqa.bagpipes.executor.uima._
 import org.apache.uima.analysis_component.AnalysisComponent
+import edu.cmu.lti.oaqa.bagpipes.executor.Result
 /**
  * Instantiate and use any UIMA AnalysisEngine in a pipeline.
  *
  * @param compDesc
  * 		A ComponentDescriptor with the class and parameters of the UIMA
  *      AnalysisEngine to use.
- * @author Collin McCormack, and Avner Maiberg
+ * @author Collin McCormack, and Avner Maiberg (amaiberg@cs.cmu.edu)
  */
 final class UimaAnnotator(compDesc: ComponentDescriptor) extends UimaComponent(compDesc) with Annotator[JCas] {
   // Create AnalysisEngine internally
@@ -31,9 +32,11 @@ final class UimaAnnotator(compDesc: ComponentDescriptor) extends UimaComponent(c
    * @param input
    * 	The JCas to process
    * @return A process copy of the input JCas
-   */
-  override def executeComponent(input: JCas): Unit = {
-    ae.process(input.getCas())
+   */ 
+  override def executeComponent(input: Result[JCas]): Result[JCas] = {
+    val result @ Result(cas) = input
+    ae.process(cas.getCas())
+    result
   }
 
   /**
