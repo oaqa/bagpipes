@@ -11,7 +11,7 @@ import org.yaml.snakeyaml.Yaml
 import java.util.ArrayList
 import java.util.HashMap
 import scala.collection.JavaConverters._
-import uk.co.turingatemyhamster.graphvizs.dsl._
+//import uk.co.turingatemyhamster.graphvizs.dsl._
 
 class Viz(yamlStr : String) {
   def yaml() : String = yamlStr
@@ -33,7 +33,22 @@ class Viz(yamlStr : String) {
 
   def printYamlStruct() : Unit = println(yamlStructure())
   
-  def yaml2Graph() : 
+  def joinToStr(curStr : String, anyObj : Any) : String = {
+    println(anyObj.toString())
+    curStr + "\n" + anyObj.toString()
+  }
+  
+  def yaml2Graph() : String = {
+    yamlStructure() match {
+      case None =>
+        ""
+      case Some(Nil) =>
+        ""
+      case Some(List(x : Map[String,Any], _*)) =>
+        x.get("pipeline").productElement(0).toString()
+//        x.get("pipeline").foldLeft("")(joinToStr)
+    }
+  }
 }
 
 object VizTesting {
@@ -73,6 +88,7 @@ object VizTesting {
                    + "        params:\n"
                    + "          spam: '4'\n")
 
-    (new Viz(yamlStr)).printYamlStruct()
+    //(new Viz(yamlStr)).printYamlStruct()
+    println((new Viz(yamlStr)).yaml2Graph())
   }
 }
