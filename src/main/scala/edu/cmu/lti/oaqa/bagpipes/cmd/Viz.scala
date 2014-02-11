@@ -10,45 +10,80 @@ package edu.cmu.lti.oaqa.bagpipes.cmd
 import org.yaml.snakeyaml.Yaml
 import java.util.ArrayList
 import java.util.HashMap
+import scala.collection.mutable.Buffer
 import scala.collection.JavaConverters._
+import scala.util.{Try, Success, Failure}
+import scala.util.control.ControlThrowable
 //import uk.co.turingatemyhamster.graphvizs.dsl._
+
+class MalformedYaml(msg : String) extends Exception(msg)
 
 class Viz(yamlStr : String) {
   def yaml() : String = yamlStr
 
-  def yamlStructure() = {
-    new Yaml().load(yamlStr) match {
-      case obj: ArrayList[_] =>
-        val seqOfMaps = obj.asScala.collect {
-          case hashMap: HashMap[_, _] =>
-            hashMap.asScala.toMap.asInstanceOf[Map[String, Any]]
-        }.toSeq
-        if (seqOfMaps.isEmpty) None else Some(seqOfMaps)
-      case obj: HashMap[_, _] =>
-        Some(Seq(obj.asScala.toMap.asInstanceOf[Map[String, Any]]))
-      case obj: Any =>
-        None
+  abstract class YamlStruct
+  case class YList(l : Buffer[YamlStruct]) extends YamlStruct
+  case class YMap(m : Map[String, YamlStruct]) extends YamlStruct
+  case class YVal(v : String) extends YamlStruct
+
+  def yamlStructure() : YamlStruct =
+    yamlStructureHelper(new Yaml().load(yamlStr))
+
+  def yamlStructureHelper(yamlObj : Any) : YamlStruct = {
+    yamlObj match {
+      case list : ArrayList[_] =>
+        // it is a list, so map over all elements after we convert it to Scala
+        // form
+        YList(list.asScala.map((elem) => elem match {
+            case obj : ArrayList[_] => yamlStructureHelper(obj)
+            case obj : HashMap[_,_] => yamlStructureHelper(obj)
+            case obj : String => YVal(obj)
+        }))
+      case hashmap : HashMap[String,_] =>
+        // it is a map, so we look at each (key, value) after we convert it
+        // to Scala form
+        val mp : Map[String,_] = Map() ++ (hashmap.asScala)
+        YMap(mp.map {
+          case (key, value) => (key, yamlStructureHelper(value))
+        })
+      case otherObj : Any =>
+        YVal(otherObj.toString())
     }
   }
 
   def printYamlStruct() : Unit = println(yamlStructure())
-  
+
   def joinToStr(curStr : String, anyObj : Any) : String = {
     println(anyObj.toString())
     curStr + "\n" + anyObj.toString()
   }
   
-  def yaml2Graph() : String = {
+  def yaml2Graph() : Try[String] = {
+    // Get the phases in the pipeline
     yamlStructure() match {
-      case None =>
-        ""
-      case Some(Nil) =>
-        ""
-      case Some(List(x : Map[String,Any], _*)) =>
-        x.get("pipeline").productElement(0).toString()
-//        x.get("pipeline").foldLeft("")(joinToStr)
+      case YMap(rootMap) =>
+          rootMap.get("pipeline") match {
+            // TODO this might not handle the simplified case where we have
+            // only 1 phase, so it's not in a list
+            case Some(YList(phases)) => Success(phases.toString())
+            case Some(YMap(singlePhase)) => Success("handle single phase")
+            case _ => Failure(new MalformedYaml("no phases exist"))
+          }
+      case _ => Failure(new MalformedYaml("Outer level is a list, not a mapping."))
     }
   }
+
+//  def yaml2Graph() : String = {
+//    yamlStructure() match {
+//      case None =>
+//        ""
+//      case Some(Nil) =>
+//        ""
+//      case Some(List(x : Map[String,Any], _*)) =>
+//        x.get("pipeline").productElement(0).toString()
+////        x.get("pipeline").foldLeft("")(joinToStr)
+//    }
+//  }
 }
 
 object VizTesting {
