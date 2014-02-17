@@ -39,6 +39,10 @@ class Viz(yamlStr : String) {
     shapes(i)
   }
 
+  def makeIndent (indentSize : Int) (indentNo : Int) : String = {
+    " " * (indentNo * indentSize)
+  }
+
   def yaml() : String = yamlStr
 
   def getYamlVal (yv : YamlStruct) : Option[String] = {
@@ -89,11 +93,33 @@ class Viz(yamlStr : String) {
           rootMap.get("pipeline") match {
             // TODO this might not handle the simplified case where we have
             // only 1 phase, so it's not in a list
-            case Some(YList(phases)) =>
+            case Some(YList(origPhases)) =>
+              // Prepend the fake start phase to this list of phases
+              val phases : Buffer[YamlStruct] = (YMap(Map(
+                  "phase"   -> YVal("Start"),
+                  "options" -> YList(Buffer(
+                      YMap(Map(
+                          "params" -> YMap(Map("start" -> YVal("")))
+                      ))
+                  ))
+                )) +=: origPhases)
+
               val r = 1 until (phases.length + 1)
               // We convert each phase into a subgraph cluster for the overall graph
-              val phaseParts : IndexedSeq[String] = r.zip(phases).map(phase2Graph)
-              Success(phaseParts.mkString("\n"))
+              // as well as the list of node names for that cluster.
+              val phaseGraphs : IndexedSeq[(String, List[String])] =
+                r.zip(phases).map(phase2Graph)
+              val (phaseParts, allNodes) = phaseGraphs.unzip
+
+              // Now we must draw the edges between all nodes in phase i
+              // to all nodes in phase i+1
+              val edges : List[String] = drawEdges (allNodes.toList)
+
+                Success("digraph {\n"
+                    + "rankdir=LR;\n\n"
+                    + phaseParts.mkString("\n") + "\n\n"
+                    + edges.mkString("\n")
+                    + "\n}")
             case Some(YMap(singlePhase)) => Success("handle single phase")
             case _ => Failure(new MalformedYaml("no phases exist"))
           }
@@ -102,8 +128,27 @@ class Viz(yamlStr : String) {
   }
 
 
+  def drawEdges (allNodes : List[List[String]]) : List[String] = {
+    allNodes match {
+      case phase1 :: phase2 :: tailPhases =>
+        val headConnections : List[String] = connectPhases (phase1) (phase2)
+        val tailConnections : List[String] = drawEdges (phase2 :: tailPhases)
+        // We flatten out the edges between a pair of phases to a string,
+        // add a newline so we can separate groupings of edges,
+        // and then prepend it to tail of connections.
+        (headConnections.mkString("\n") + "\n") :: tailConnections
+      case _ => Nil
+    }
+  }
+
+  // Draws an edge between every node in phase1 to every node in phase2
+  def connectPhases (phase1 : List[String]) (phase2 : List[String]) : List[String] = {
+    phase1.map (x => x + " -> {" + phase2.mkString(" ") + "}")
+  }
+
+
   // Converts a given phrase to its string representation for Graphviz.
-  private def phase2Graph (x : (Int, YamlStruct)) : String = {
+  private def phase2Graph (x : (Int, YamlStruct)) : (String, List[String]) = {
     val clusterNo : Int = x._1
     val clusterShape : String = graphvizShapes(clusterNo)
     val YMap(phase) : YamlStruct = x._2
@@ -111,7 +156,7 @@ class Viz(yamlStr : String) {
     // We just assign to this case so it will crash if the YAML was not
     // formatted correctly.
     val Some(YVal(phaseName)) : Option[YamlStruct] = phase.get("phase")
-    val clusterLabel = "label=\"" + phaseName
+    val clusterLabel = "label=\"" + phaseName + "\""
     val Some(YList(options)) : Option[YamlStruct] = phase.get("options")
     val nodeParams : List[String] = option2Graph (options) (clusterShape)
     // We get the names of nodes and also prepend these node names to the
@@ -121,12 +166,15 @@ class Viz(yamlStr : String) {
                                                     (0))
     // We create a subgraph section. This includes the section header, a
     // subgraph cluster label, and the list of nodes within that subgraph
-    ("subgraph cluster_" + clusterNo.toString() + " {\n"
+    (("subgraph cluster_" + clusterNo.toString() + " {\n"
         + clusterLabel + "\n"
         // TODO we need to prepend the node names here and also
         // return a list of the node names
         + graphvizLines.mkString("\n")
-        + "\n}")
+        + "\n}"),
+
+        // We also return the names of the nodes for the phase
+        nodeNames)
   }
 
   // Given a cluster number and the parameters for the nodes in that cluster,
@@ -167,7 +215,18 @@ class Viz(yamlStr : String) {
           val aLabel = params.foldLeft ("") ({
             case (folded : String, (k : String, v : YamlStruct)) =>
               val YVal(paramV) = v
-              folded + "\\n" + k + ": " + paramV
+
+              paramV match {
+                // If the value is an empty string, then we do not display it.
+                // We also use this when we insert the start phase cluster
+                // that actually has no options.
+                // TODO Note that we might want to try something a little less
+                // hacky here, cause this is using the model in an inconsistent
+                // way to get something done easily in the current way the code
+                // works.
+                case "" => folded + "\\n" + k
+                case x => folded + "\\n" + k + ": " + x
+              }
           })
           // We remove the leading newline add add in the shape
           val nodeParams : String = (
