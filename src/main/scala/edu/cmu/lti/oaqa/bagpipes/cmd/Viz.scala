@@ -114,14 +114,38 @@ class Viz(yamlStr : String) {
     val clusterLabel = "label=\"" + phaseName
     val Some(YList(options)) : Option[YamlStruct] = phase.get("options")
     val nodeParams : List[String] = option2Graph (options) (clusterShape)
+    // We get the names of nodes and also prepend these node names to the
+    // Graphviz parameters for each node.
+    val (nodeNames, graphvizLines) = (makeNodeNames (clusterNo)
+                                                    (nodeParams)
+                                                    (0))
     // We create a subgraph section. This includes the section header, a
     // subgraph cluster label, and the list of nodes within that subgraph
     ("subgraph cluster_" + clusterNo.toString() + " {\n"
         + clusterLabel + "\n"
         // TODO we need to prepend the node names here and also
         // return a list of the node names
-        + nodeParams.mkString("\n")
+        + graphvizLines.mkString("\n")
         + "\n}")
+  }
+
+  // Given a cluster number and the parameters for the nodes in that cluster,
+  // we give each cluster a name.
+  // We return the list of node names as well as the list of
+  // Graphviz node strings.
+  def makeNodeNames (clusterNo : Int) (nodeParams : List[String]) (nodeNo : Int)
+    : (List[String], List[String]) = {
+    nodeParams match {
+      case Nil => (Nil, Nil)
+      case (head) :: tail =>
+        val nodeName : String = "p" + clusterNo.toString + "_" + nodeNo.toString
+        val (tailNames, tailGraphviz) = makeNodeNames (clusterNo) (tail) (nodeNo + 1)
+
+        // We prepend the node name to the node parameters, and then we return
+        // both the node name and the Graphviz string.
+        (nodeName :: tailNames,
+            (nodeName + " " + head) :: tailGraphviz)
+    }
   }
 
   // We create a node for each option. We start with a list of options and
