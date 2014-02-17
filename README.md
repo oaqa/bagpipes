@@ -73,11 +73,14 @@ To execute an arbitrary yaml `myDesc.yaml` configuration, simply run:
 bagpipes exec myDesc
 ```
 
-For example, to execute the configuration above, you can run:
+For example, to execute the configuration above, you can run,
 
-1. `bagpipes init pl -n --collection-reader "collection_reader.filesystem-collection-reader" --component "tutorial.ex1.RoomNumberAnnotator" Pp1=foo p2=bar > myDesc.yaml`
+```bash 
+bagpipes init pl -n --collection-reader "collection_reader.filesystem-collection-reader" --component "tutorial.ex1.RoomNumberAnnotator" Pp1=foo p2=bar > myDesc.yaml
+```
+Then execute with,
 
-2. `bagpipes exec myDesc`  
+`bagpipes exec myDesc`  
 
 ### As a dependency
 To include BagPipes as a maven dependency, (for now) clone it to your local machine and add this to your `pom.xml`:
