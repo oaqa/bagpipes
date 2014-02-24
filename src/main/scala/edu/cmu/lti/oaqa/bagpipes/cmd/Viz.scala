@@ -36,8 +36,9 @@ class Viz(yamlStr : String) {
 
   // This gets a specific shape instead of the whole list.
   def graphvizShapes(i : Int) : String = {
-    val shapes = Vector("box", "ellipse", "oval", "diamond", "parallelogram",
-        "house", "hexagon", "rectangle", "trapezium", "egg", "circle")
+    val shapes = Vector("box", "ellipse", "rectangle", "diamond",
+        "parallelogram", "house", "hexagon", "trapezium", "egg",
+        "circle", "oval")
     shapes(i)
   }
 
@@ -55,6 +56,7 @@ class Viz(yamlStr : String) {
     }
   }
 
+  // Converts the YAML string to a algebraic datatype structure
   def yamlStructure() : YamlStruct =
     yamlStructureHelper(new Yaml().load(yamlStr))
 
@@ -80,13 +82,14 @@ class Viz(yamlStr : String) {
     }
   }
 
-  def printYamlStruct() : Unit = println(yamlStructure())
-
+  // Given a string and any other object, converts the other object to a
+  // string and joins them with a newline
   def joinToStr(curStr : String, anyObj : Any) : String = {
     println(anyObj.toString())
     curStr + "\n" + anyObj.toString()
   }
 
+  // Converts the algebraic YAML structure to a graph structure
   def yaml2Graph() : Try[Graph] = {
     // Get the phases in the pipeline
     yamlStructure() match {
@@ -120,6 +123,7 @@ class Viz(yamlStr : String) {
     }
   }
 
+  // Creates all edges between clusters
   def drawEdges (clusters : List[Cluster]) : List[Edge] = {
     clusters match {
       case cluster1 :: cluster2 :: tailClusters =>
@@ -200,7 +204,9 @@ class Viz(yamlStr : String) {
     addNodeNames (clusterNo) (nodeLabels) (0)
   }
 
-
+  // Given the node parameter (label, specifically), add the node name to the
+  // node as well. When this is done we can instantiate an object of the node
+  // class.
   def addNodeNames (clusterNo : Int) (nodeLabels : List[String]) (nodeNo : Int)
     : List[Node] = {
     nodeLabels match {
@@ -214,6 +220,7 @@ class Viz(yamlStr : String) {
   }
 
 
+  // Converts the graph to the graphviz output format
   def graph2Graphviz() : String = {
     val r = 1 until (graph.clusters.length + 1)
     val clusters : IndexedSeq[String] = r.zip(graph.clusters).map(cluster2Graphviz)
@@ -221,11 +228,12 @@ class Viz(yamlStr : String) {
     val edges : List[String] = graph.edges.map (edge2Graphviz)
 
     ("digraph {\n"
-        + "rankdir=LR;\n\n"
+        + (makeIndent (4) (1)) + "rankdir=LR;\n\n"
         + clusters.mkString("\n") + "\n\n"
-        + edges.mkString("\n")
+        + (makeIndent (4) (1)) + edges.mkString("\n" + (makeIndent (4) (1)))
         + "\n}")
   }
+
 
   // Converts a given phrase to its string representation for Graphviz.
   private def cluster2Graphviz (x : (Int, Cluster)) : String = {
@@ -233,29 +241,31 @@ class Viz(yamlStr : String) {
     val clusterShape : String = graphvizShapes(clusterNo)
     val cluster : Cluster = x._2
 
-    val clusterLabel = cluster.clusterName
+    val clusterLabel = "label=\"" + cluster.clusterName + "\";"
     // A list of node declarations along with the node parameters
     val nodeParams : List[String] =
       cluster.clusterNodes.map (node2Graphviz (clusterShape ) (_))
 
     // We create a subgraph section. This includes the section header, a
     // subgraph cluster label, and the list of nodes within that subgraph
-    ("subgraph cluster_" + clusterNo.toString() + " {\n"
-        + clusterLabel + "\n"
-        + nodeParams.mkString("\n")
-        + "\n}")
+    ((makeIndent (4) (1)) + "subgraph cluster_" + clusterNo.toString() + " {\n"
+        + (makeIndent (4) (2)) + clusterLabel + "\n"
+        + (makeIndent (4) (2)) + nodeParams.mkString("\n" + (makeIndent (4) (2)))
+        + "\n" + (makeIndent (4) (1)) + "}")
   }
+
 
   // We create a node for each option. We start with a list of options and
   // return the formatted strings for each of those options.
   def node2Graphviz (shape : String) (node : Node) : String = {
-    val parameters = "[label=\"" + node.nodeLabel + "\", shape=" + shape + "]"
+    val parameters = "[label=\"" + node.nodeLabel + "\", shape=" + shape + "];"
     node.nodeName + " " + parameters
   }
 
 
+  // Converts the graph edge to the output format expected by graphviz
   def edge2Graphviz (edge : Edge) : String = {
-    edge.fromNode.nodeName + " -> {" + edge.toNode.nodeName + "}"
+    edge.fromNode.nodeName + " -> {" + edge.toNode.nodeName + "};"
   }
 }
 
