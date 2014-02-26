@@ -137,12 +137,28 @@ class Viz(yamlStr : String) {
     }
   }
 
+  def crossProd[A, B] (list1 : List[A]) (list2 : List[B]) : List[(A, B)] = {
+    list1.foldLeft (List[(A, B)]()) ((folded: List[(A, B)], x) =>
+        folded ++ (list2.map ((y) => (x,y))))
+  }
+
+  def crossProd[A] (input : List[List[A]]) : List[List[A]] = {
+    input.foldRight (List(Nil) : List[List[A]]) ((aList : List[A], partProd : List[List[A]]) =>
+      aList.foldRight (Nil : List[List[A]]) ((x : A, folded : List[List[A]]) => (prependToAll (partProd) (x)) ++ folded)
+      )
+  }
+
+  def prependToAll[A] (lists : List[List[A]]) (elem : A) : List[List[A]] = {
+    lists.map ((aList : List[A]) => elem :: aList)
+  }
+
   // Create an edge between every node in cluster1 to every node in cluster2
   def connectClusters (cluster1 : Cluster) (cluster2 : Cluster) : List[Edge] = {
     val c1Nodes = cluster1.clusterNodes
     val c2Nodes = cluster2.clusterNodes
-    c1Nodes.foldLeft (List[Edge]()) ((edges : List[Edge], c1Node) =>
-        edges ++ (c2Nodes.map ((c2Node) => new Edge(c1Node, c2Node))))
+    (crossProd (c1Nodes) (c2Nodes)).map ({
+      case (fromNode, toNode) => new Edge(fromNode, toNode)
+    })
   }
 
 
@@ -156,10 +172,48 @@ class Viz(yamlStr : String) {
     // formatted correctly.
     val Some(YVal(phaseName)) : Option[YamlStruct] = phase.get("phase")
     val clusterName = phaseName
-    val Some(YList(options)) : Option[YamlStruct] = phase.get("options")
-    val clusterNodes : List[Node] = option2Graph (options) (clusterNo)
+    // Try to get options and cross-opts. If we get cross-opts,
+    // we just create the cross-product set and add those like they
+    // were normal options
+    val clusterNodes : List[Node] =
+      (phase.get("options"), phase.get("cross-opts")) match {
+        case (Some(YList(options)), Some(YMap(crossOpts))) => Nil
+        case (Some(YList(options)), _) => handleOptions (clusterNo) (options)
+        case (_, Some(YMap(crossOpts))) => Nil
+        // TODO handle the issue of no options here
+        case (_, _) =>  Nil
+    }
 
     (new Cluster(clusterName, clusterNodes))
+  }
+
+  // Processes the cross options and formats them as if they were normal
+  // options. This allows us to proceed normally after we've formatted
+  // the cross options.
+  def crossOptsFormatted (crossOpts : Map[String, YamlStruct]) : Buffer[YamlStruct] = {
+    // We have a map from parameter names to the list of available values for
+    // that parameter. We want to change this so that each element in the list
+    // of parameter values is paired up with its parameter name. Then we can
+    // throw all of these together in a big nested list and create a
+    // cross-product of them.
+    val preppedOpts =
+      (crossOpts.foldRight (Nil : List[List[(String, YamlStruct)]])
+          ({
+            case ((pName, YList(pVals)), folded) =>
+              (prepareCrossOpt (pName) (pVals)) :: folded
+           }))
+    val crossedOpts = crossProd (preppedOpts)
+  }
+
+  // We need to match up the opt name with its possible values so that when we
+  // take the cross product, we know what parameter each value cooresponds to
+  def prepareCrossOpt (optName : String) (optVals : Buffer[YamlStruct]) : List[(String, YamlStruct)] = {
+    optVals.map((v : YamlStruct) => (optName, v)).toList
+  }
+
+  def handleOptions (clusterNo : Int) (options : Buffer[YamlStruct]) : List[Node] = {
+    val clusterNodes : List[Node] = option2Graph (options) (clusterNo)
+    clusterNodes
   }
 
   // We create a node for each option. We start with a list of options and
