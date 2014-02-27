@@ -177,9 +177,16 @@ class Viz(yamlStr : String) {
     // were normal options
     val clusterNodes : List[Node] =
       (phase.get("options"), phase.get("cross-opts")) match {
-        case (Some(YList(options)), Some(YMap(crossOpts))) => Nil
+        // Combine the options with the cross options
+        case (Some(YList(options)), Some(YMap(crossOpts))) =>
+          val crossedOpts = crossOptsFormatted(crossOpts)
+          handleOptions (clusterNo) (options ++ crossedOpts)
+
         case (Some(YList(options)), _) => handleOptions (clusterNo) (options)
-        case (_, Some(YMap(crossOpts))) => Nil
+
+        case (_, Some(YMap(crossOpts))) =>
+          handleOptions (clusterNo) (crossOptsFormatted(crossOpts))
+
         // TODO handle the issue of no options here
         case (_, _) =>  Nil
     }
@@ -203,6 +210,25 @@ class Viz(yamlStr : String) {
               (prepareCrossOpt (pName) (pVals)) :: folded
            }))
     val crossedOpts = crossProd (preppedOpts)
+    val d = println (crossedOpts)
+
+    // For each outer list, process it into an item in the YAML options buffer
+    val newOpts : List[YamlStruct] =
+      crossedOpts.map ((crossElem : List[(String, YamlStruct)]) =>
+        // Wrap the parameters in a YMap under the "params" key
+        wrapParams (
+            // Put the list of items in the cross product in a Map
+            YMap(crossElem.foldRight (Map() : Map[String, YamlStruct]) ((kv, folded) =>
+              folded + kv))))
+
+    // TODO we should probably just be working in Buffers from the start
+    newOpts.toBuffer
+  }
+
+  // Given a YamlStruct of parameters, we just wrap it in a YMap under
+  // the "params" key
+  def wrapParams (params : YamlStruct) : YamlStruct = {
+    YMap(Map("params" -> params))
   }
 
   // We need to match up the opt name with its possible values so that when we
