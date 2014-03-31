@@ -85,7 +85,6 @@ class Viz(yamlStr : String) {
   // Given a string and any other object, converts the other object to a
   // string and joins them with a newline
   def joinToStr(curStr : String, anyObj : Any) : String = {
-    println(anyObj.toString())
     curStr + "\n" + anyObj.toString()
   }
 
@@ -210,7 +209,6 @@ class Viz(yamlStr : String) {
               (prepareCrossOpt (pName) (pVals)) :: folded
            }))
     val crossedOpts = crossProd (preppedOpts)
-    val d = println (crossedOpts)
 
     // For each outer list, process it into an item in the YAML options buffer
     val newOpts : List[YamlStruct] =
@@ -380,39 +378,43 @@ class Graph(gClusters : List[Cluster], gEdges : List[Edge]) {
 object VizTesting {
   def main(args : Array[String]) : Unit = {
     val yamlStr = ("pipeline:\n"
-                   + "  - phase: phase1\n"
-                   + "    options:\n"
-                   + "      - inherit: dummies.dummyReader\n"
-                   + "        params:\n"
-                   + "          foo: '0.2229648733341804'\n"
-                   + "      - inherit: dummies.dummyReader\n"
-                   + "        params:\n"
-                   + "          foo: '0.4344104743445896'\n"
-                   + "      - inherit: dummies.dummyReader\n"
-                   + "        params:\n"
-                   + "          foo: '0.48870936286436595'\n"
-                   + "  - phase: phase2\n"
-                   + "    options:\n"
-                   + "      - inherit: dummies.dummyReader\n"
-                   + "        params:\n"
-                   + "          bar: 'dog'\n"
-                   + "      - inherit: dummies.dummyReader\n"
-                   + "        params:\n"
-                   + "          bar: 'cat'\n"
-                   + "  - phase: phase3\n"
-                   + "    options:\n"
-                   + "      - inherit: dummies.dummyReader\n"
-                   + "        params:\n"
-                   + "          spam: '1'\n"
-                   + "      - inherit: dummies.dummyReader\n"
-                   + "        params:\n"
-                   + "          spam: '2'\n"
-                   + "      - inherit: dummies.dummyReader\n"
-                   + "        params:\n"
-                   + "          spam: '3'\n"
-                   + "      - inherit: dummies.dummyReader\n"
-                   + "        params:\n"
-                   + "          spam: '4'\n")
+                    + "  - phase: phase1\n"
+                    + "    options:\n"
+                    + "      - inherit: dummies.dummyReader\n"
+                    + "        params:\n"
+                    + "          foo: '0.2229648733341804'\n"
+                    + "      - inherit: dummies.dummyReader\n"
+                    + "        params:\n"
+                    + "          foo: '0.4344104743445896'\n"
+                    + "      - inherit: dummies.dummyReader\n"
+                    + "        params:\n"
+                    + "          foo: '0.48870936286436595'\n"
+                    + "  - phase: phase2\n"
+                    + "    options:\n"
+                    + "      - inherit: dummies.dummyReader\n"
+                    + "        params:\n"
+                    + "          bar: 'dog'\n"
+                    + "      - inherit: dummies.dummyReader\n"
+                    + "        params:\n"
+                    + "          bar: 'cat'\n"
+                    + "  - phase: phase3\n"
+                    + "    options:\n"
+                    + "      - inherit: dummies.dummyReader\n"
+                    + "        params:\n"
+                    + "          spam: '1'\n"
+                    + "      - inherit: dummies.dummyReader\n"
+                    + "        params:\n"
+                    + "          spam: '2'\n"
+                    + "      - inherit: dummies.dummyReader\n"
+                    + "        params:\n"
+                    + "          spam: '3'\n"
+                    + "      - inherit: dummies.dummyReader\n"
+                    + "        params:\n"
+                    + "          spam: '4'\n"
+                    + "  - phase: phase4\n"
+                    + "    cross-opts:\n"
+                    + "      parameter-a: [value100, value200]\n"
+                    + "      parameter-b: [value300, value400]\n")
 
     println((new Viz(yamlStr)).graph2Graphviz())
   }
