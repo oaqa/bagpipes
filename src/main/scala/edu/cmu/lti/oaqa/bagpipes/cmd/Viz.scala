@@ -14,8 +14,6 @@ import scala.collection.mutable.Buffer
 import scala.collection.JavaConverters._
 import scala.util.{Try, Success, Failure}
 import scala.util.control.ControlThrowable
-//import uk.co.turingatemyhamster.graphvizs.dsl._
-
 class MalformedYaml(msg : String) extends Exception(msg)
 
 class Viz(yamlStr : String) {
@@ -24,7 +22,26 @@ class Viz(yamlStr : String) {
   case class YMap(m : Map[String, YamlStruct]) extends YamlStruct
   case class YVal(v : String) extends YamlStruct
 
-  val graph : Graph = yaml2Graph().get
+  // A simple cross product that creates the cross product of two lists.
+  // So, this is at most a 2-dimensional cross product.
+  def crossProd[A, B] (list1 : List[A]) (list2 : List[B]) : List[(A, B)] = {
+    list1.foldLeft (List[(A, B)]()) ((folded: List[(A, B)], x) =>
+        folded ++ (list2.map ((y) => (x,y))))
+  }
+
+  // Helper function for the more complete cross product function
+  def prependToAll[A] (lists : List[List[A]]) (elem : A) : List[List[A]] = {
+    lists.map ((aList : List[A]) => elem :: aList)
+  }
+
+  // Creates a cross product between every inner list in the argument list
+  def crossProd[A] (input : List[List[A]]) : List[List[A]] = {
+    input.foldRight (List(Nil) : List[List[A]]) ((aList : List[A], partProd : List[List[A]]) =>
+      aList.foldRight (Nil : List[List[A]]) ((x : A, folded : List[List[A]]) => (prependToAll (partProd) (x)) ++ folded)
+      )
+  }
+
+  // TODO the shapes below should be agnostic of the backend
 
   // Each phase should have a unique shape, so we provide a static list of
   // shapes here. The first phase will select the first shape, and so on.
@@ -42,12 +59,19 @@ class Viz(yamlStr : String) {
     shapes(i)
   }
 
+  // Creates an indentation string at a given level, where each indent has a
+  // width equal to the supplied number of spaces
   def makeIndent (indentSize : Int) (indentNo : Int) : String = {
     " " * (indentNo * indentSize)
   }
 
+  val graph : Graph = yaml2Graph().get
+
+  // Accessor to get the yaml string
   def yaml() : String = yamlStr
 
+  // Used to unwrap YAML values. Evaluates to None if we attempt to do so on a
+  // list or a map.
   def getYamlVal (yv : YamlStruct) : Option[String] = {
     yv match {
       case YList (l) => None
@@ -134,21 +158,6 @@ class Viz(yamlStr : String) {
         headConnections ++ tailConnections
       case _ => Nil
     }
-  }
-
-  def crossProd[A, B] (list1 : List[A]) (list2 : List[B]) : List[(A, B)] = {
-    list1.foldLeft (List[(A, B)]()) ((folded: List[(A, B)], x) =>
-        folded ++ (list2.map ((y) => (x,y))))
-  }
-
-  def crossProd[A] (input : List[List[A]]) : List[List[A]] = {
-    input.foldRight (List(Nil) : List[List[A]]) ((aList : List[A], partProd : List[List[A]]) =>
-      aList.foldRight (Nil : List[List[A]]) ((x : A, folded : List[List[A]]) => (prependToAll (partProd) (x)) ++ folded)
-      )
-  }
-
-  def prependToAll[A] (lists : List[List[A]]) (elem : A) : List[List[A]] = {
-    lists.map ((aList : List[A]) => elem :: aList)
   }
 
   // Create an edge between every node in cluster1 to every node in cluster2
@@ -345,30 +354,6 @@ class Viz(yamlStr : String) {
   def edge2Graphviz (edge : Edge) : String = {
     edge.fromNode.nodeName + " -> {" + edge.toNode.nodeName + "};"
   }
-}
-
-
-/*************************************************
- * The classes for the graph representation
- ************************************************/
-class Node(nName : String, nLabel : String) {
-  val nodeName : String = nName
-  val nodeLabel : String = nLabel
-}
-
-class Edge(fNode : Node, tNode : Node) {
-  val fromNode : Node = fNode
-  val toNode : Node = tNode
-}
-
-class Cluster(cName : String, cNodes : List[Node]) {
-  val clusterName : String = cName
-  var clusterNodes : List[Node] = cNodes
-}
-
-class Graph(gClusters : List[Cluster], gEdges : List[Edge]) {
-  var clusters : List[Cluster] = gClusters
-  var edges : List[Edge] = gEdges
 }
 
 
