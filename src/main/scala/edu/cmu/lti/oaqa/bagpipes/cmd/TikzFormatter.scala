@@ -45,8 +45,8 @@ class TikzFormatter (graphArg : Graph) extends VizOutputFormat {
     // Prepare the string for the phase node
     val cNoStr = clusterNo.toString()
     val phaseStr = clusterNo match {
-      case 1 => "Start"
-      case n => "Phase " + (clusterNo - 1).toString()
+      case 1 => "\\underline{\\textbf{" + "Start" + "}}"
+      case n => "\\underline{\\textbf{" + "Phase " + (clusterNo - 1).toString() + "}}"
     }
     val phaseNodeStr = "\\node (p" + cNoStr + "_title) [above=1cm of p" + cNoStr + "_0] {" + phaseStr + "};"
 
