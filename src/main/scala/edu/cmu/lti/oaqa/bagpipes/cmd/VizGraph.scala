@@ -7,6 +7,8 @@ package edu.cmu.lti.oaqa.bagpipes.cmd
  * We can generalize this in the future.
  */
 
+// TODO use IndexedSeq here instead of List
+
 class Node(nName : String, nLabel : String) {
   val nodeName : String = nName
   val nodeLabel : String = nLabel
@@ -19,10 +21,10 @@ class Edge(fNode : Node, tNode : Node) {
 
 class Cluster(cName : String, cNodes : List[Node]) {
   val clusterName : String = cName
-  var clusterNodes : List[Node] = cNodes
+  val clusterNodes : List[Node] = cNodes
 }
 
 class Graph(gClusters : List[Cluster], gEdges : List[Edge]) {
-  var clusters : List[Cluster] = gClusters
-  var edges : List[Edge] = gEdges
+  val clusters : List[Cluster] = gClusters
+  val edges : List[Edge] = gEdges
 }

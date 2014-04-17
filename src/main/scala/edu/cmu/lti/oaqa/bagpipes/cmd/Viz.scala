@@ -14,6 +14,7 @@ import scala.collection.mutable.Buffer
 import scala.collection.JavaConverters._
 import scala.util.{Try, Success, Failure}
 import scala.util.control.ControlThrowable
+
 class MalformedYaml(msg : String) extends Exception(msg)
 
 class Viz(yamlStr : String) {
@@ -39,30 +40,6 @@ class Viz(yamlStr : String) {
     input.foldRight (List(Nil) : List[List[A]]) ((aList : List[A], partProd : List[List[A]]) =>
       aList.foldRight (Nil : List[List[A]]) ((x : A, folded : List[List[A]]) => (prependToAll (partProd) (x)) ++ folded)
       )
-  }
-
-  // TODO the shapes below should be agnostic of the backend
-
-  // Each phase should have a unique shape, so we provide a static list of
-  // shapes here. The first phase will select the first shape, and so on.
-  // If we have too many phases, then we will run out of shapes. We can fix
-  // these methods if that use case pops up.
-  def graphvizShapes() : List[String] = List("box", "ellipse", "oval",
-      "diamond", "parallelogram", "house", "hexagon", "rectangle",
-      "trapezium", "egg", "circle")
-
-  // This gets a specific shape instead of the whole list.
-  def graphvizShapes(i : Int) : String = {
-    val shapes = Vector("box", "ellipse", "rectangle", "diamond",
-        "parallelogram", "house", "hexagon", "trapezium", "egg",
-        "circle", "oval")
-    shapes(i)
-  }
-
-  // Creates an indentation string at a given level, where each indent has a
-  // width equal to the supplied number of spaces
-  def makeIndent (indentSize : Int) (indentNo : Int) : String = {
-    " " * (indentNo * indentSize)
   }
 
   val graph : Graph = yaml2Graph().get
@@ -104,12 +81,6 @@ class Viz(yamlStr : String) {
       case otherObj : Any =>
         YVal(otherObj.toString())
     }
-  }
-
-  // Given a string and any other object, converts the other object to a
-  // string and joins them with a newline
-  def joinToStr(curStr : String, anyObj : Any) : String = {
-    curStr + "\n" + anyObj.toString()
   }
 
   // Converts the algebraic YAML structure to a graph structure
@@ -305,55 +276,6 @@ class Viz(yamlStr : String) {
         (new Node(nodeName, head)) :: tailNodes
     }
   }
-
-
-  // Converts the graph to the graphviz output format
-  def graph2Graphviz() : String = {
-    val r = 1 until (graph.clusters.length + 1)
-    val clusters : IndexedSeq[String] = r.zip(graph.clusters).map(cluster2Graphviz)
-    // TODO delete after here
-    val edges : List[String] = graph.edges.map (edge2Graphviz)
-
-    ("digraph {\n"
-        + (makeIndent (4) (1)) + "rankdir=LR;\n\n"
-        + clusters.mkString("\n") + "\n\n"
-        + (makeIndent (4) (1)) + edges.mkString("\n" + (makeIndent (4) (1)))
-        + "\n}")
-  }
-
-
-  // Converts a given phrase to its string representation for Graphviz.
-  private def cluster2Graphviz (x : (Int, Cluster)) : String = {
-    val clusterNo : Int = x._1
-    val clusterShape : String = graphvizShapes(clusterNo)
-    val cluster : Cluster = x._2
-
-    val clusterLabel = "label=\"" + cluster.clusterName + "\";"
-    // A list of node declarations along with the node parameters
-    val nodeParams : List[String] =
-      cluster.clusterNodes.map (node2Graphviz (clusterShape ) (_))
-
-    // We create a subgraph section. This includes the section header, a
-    // subgraph cluster label, and the list of nodes within that subgraph
-    ((makeIndent (4) (1)) + "subgraph cluster_" + clusterNo.toString() + " {\n"
-        + (makeIndent (4) (2)) + clusterLabel + "\n"
-        + (makeIndent (4) (2)) + nodeParams.mkString("\n" + (makeIndent (4) (2)))
-        + "\n" + (makeIndent (4) (1)) + "}")
-  }
-
-
-  // We create a node for each option. We start with a list of options and
-  // return the formatted strings for each of those options.
-  def node2Graphviz (shape : String) (node : Node) : String = {
-    val parameters = "[label=\"" + node.nodeLabel + "\", shape=" + shape + "];"
-    node.nodeName + " " + parameters
-  }
-
-
-  // Converts the graph edge to the output format expected by graphviz
-  def edge2Graphviz (edge : Edge) : String = {
-    edge.fromNode.nodeName + " -> {" + edge.toNode.nodeName + "};"
-  }
 }
 
 
@@ -401,6 +323,8 @@ object VizTesting {
                     + "      parameter-a: [value100, value200]\n"
                     + "      parameter-b: [value300, value400]\n")
 
-    println((new Viz(yamlStr)).graph2Graphviz())
+    val theViz = new Viz(yamlStr)
+    val graphvizFormatter = new GraphvizFormatter(theViz.graph)
+    println(graphvizFormatter.formatGraph())
   }
 }
