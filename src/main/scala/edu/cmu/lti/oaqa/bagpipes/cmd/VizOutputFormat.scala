@@ -35,7 +35,7 @@ trait VizOutputFormat {
   def availableShapes : Vector[NodeShape] =
     shapeStrs.map ((shapeStr) => new NodeShape(shapeStr))
 
-  val graph : Graph
+  def graph : Graph
 
   // Maybe we are over-specifying how to do format the output, but let's just
   // roll like this for now..
@@ -51,6 +51,10 @@ trait VizOutputFormat {
   // Converts a given phase to its string representation for the output format.
   def formatCluster (indexedCluster : (Int, Cluster)) : String
   def formatShape (shape : NodeShape) : String
+  // By default, we ignore the node number parameter passed in
+  def formatNumNode (shape : NodeShape) (num : Int, node : Node) : String = {
+    formatNode (shape) (node)
+  }
   // We create a node for each option. We start with a list of options and
   // return the formatted strings for each of those options.
   def formatNode (shape : NodeShape) (node : Node) : String

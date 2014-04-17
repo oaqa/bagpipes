@@ -325,6 +325,8 @@ object VizTesting {
 
     val theViz = new Viz(yamlStr)
     val graphvizFormatter = new GraphvizFormatter(theViz.graph)
-    println(graphvizFormatter.formatGraph())
+    val tikzFormatter = new TikzFormatter(theViz.graph)
+    // println(graphvizFormatter.formatGraph())
+    println(tikzFormatter.formatGraph())
   }
 }
