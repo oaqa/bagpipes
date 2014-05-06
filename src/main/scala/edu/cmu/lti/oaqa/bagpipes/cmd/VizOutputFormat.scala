@@ -48,6 +48,20 @@ trait VizOutputFormat {
     joinClustersAndEdges (clusters) (edges)
   }
 
+
+//  def formatGraph (before : Int, after : Int) : String = {
+//    val r = 1 until (graph.clusters.length + 1)
+//    val collapsedGraph
+//    val clusters : IndexedSeq[String] = r.zip(graph.clusters).map(formatCluster (before, after) (_))
+//    val edges : IndexedSeq[String] = graph.edges.map
+//
+//    joinClustersAndEdges (clusters) (edges)
+//  }
+//
+//  def formatGraph (numVis : Int) : String = {
+//    formatGraph (numVis, numVis)
+//  }
+
   // Converts a given phase to its string representation for the output format.
   def formatCluster (indexedCluster : (Int, Cluster)) : String
   def formatShape (shape : NodeShape) : String
