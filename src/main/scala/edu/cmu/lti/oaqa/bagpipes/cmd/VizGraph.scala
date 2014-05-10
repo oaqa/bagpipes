@@ -1,5 +1,7 @@
 package edu.cmu.lti.oaqa.bagpipes.cmd
 
+import scala.util.matching.Regex
+
 /**
  * The graph structure that we use to represent pipeline paths through
  * bagpipes.
@@ -11,9 +13,23 @@ package edu.cmu.lti.oaqa.bagpipes.cmd
 
 // For now, let's make the assumption that node names are unique and that is
 // how we identify them.
-class Node(nName : String, nLabel : String) {
-  val nodeName : String = nName
+class Node(nName : String, nLabel : String, isCollapse : Boolean = false) {
+  private val collapsePrefix : String = "<COLLAPSED_NODES:"
+  private val collapseSuffix : String = ">"
+
+  val nodeName : String = isCollapse match {
+    case false => nName
+    case true  => collapsePrefix + nName + collapseSuffix
+  }
   val nodeLabel : String = nLabel
+
+  def isCollapseNode : Boolean = {
+    val pattern : Regex = ("\\A" + collapsePrefix + ".+" + collapseSuffix + "\\z").r
+    pattern.findFirstIn(nodeName) match {
+      case None => false
+      case Some(matchedStr) => true
+    }
+  }
 }
 
 class Edge(fNode : Node, tNode : Node) {
@@ -32,7 +48,7 @@ class Cluster(cName : String, cNodes : List[Node]) {
   // So, the collapse node name has the prefix: "<COLLAPSED_NODES:", then the
   // `clusterName` value, then the suffix ">".
   def collapseCluster (before : Int, after : Int) : (Cluster, Set[Node], Option[Node]) = {
-    val cNode = new Node("<COLLAPSED_NODES:" + clusterName + ">", "...")
+    val cNode = new Node(clusterName, "...", true)
     // Remove all nodes except for the `before` nodes and the `after` nodes.
     // Insert the node representing the collapse in between the before and
     // after parts.
@@ -68,11 +84,20 @@ class Graph(gClusters : List[Cluster], gEdges : List[Edge]) {
         // Both nodes in the edge were collapsed, so don't bother drawing the edge
         case (true, true)   => partEdges
         // We preserve the edge from a node to a node that was collapsed
-        case (true, false)  => (new Edge(collapseNode,  edge.toNode))  +: partEdges
-        case (false, true)  => (new Edge(edge.fromNode, collapseNode)) +: partEdges
+        case (true, false)  => (prependUncollapsed (new Edge(collapseNode,  edge.toNode))
+                                                   (partEdges))
+        case (false, true)  => (prependUncollapsed (new Edge(edge.fromNode, collapseNode))
+                                                   (partEdges))
         // If neither node was collapsed, then we don't have to change anything
         case (false, false) => edge +: partEdges
       }
+    }
+  }
+
+  private def prependUncollapsed(edge : Edge) (edges : List[Edge]) : List[Edge] = {
+    (edge.fromNode.isCollapseNode && edge.toNode.isCollapseNode) match {
+      case true => edges
+      case false => edge +: edges
     }
   }
 
