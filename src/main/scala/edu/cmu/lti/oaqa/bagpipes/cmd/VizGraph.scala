@@ -14,7 +14,7 @@ import scala.util.matching.Regex
 // For now, let's make the assumption that node names are unique and that is
 // how we identify them.
 class Node(nName : String, nLabel : String, isCollapse : Boolean = false) {
-  private val collapsePrefix : String = "<COLLAPSED_NODES:"
+  private val collapsePrefix : String = "<COLLAPSED_NODES_"
   private val collapseSuffix : String = ">"
 
   val nodeName : String = isCollapse match {
@@ -70,16 +70,25 @@ class Cluster(cName : String, cNodes : List[Node]) {
   }
 }
 
-class Graph(gClusters : List[Cluster], gEdges : List[Edge]) {
+// A graph, for our purposes, is an ordered list of clusters and a set of edges.
+// Each cluster has an ordered list of nodes, and the edge set connects nodes
+// in between clusters, and for other purposes maybe within clusters.
+class Graph(gClusters : List[Cluster], gEdges : Set[Edge]) {
+  // Other constructor that accepts a list of edges and then converts them to
+  // a set of edges.
+  def this(gClusters : List[Cluster], gEdges : List[Edge]) = {
+    this(gClusters, gEdges.toSet)
+  }
+
   val clusters : List[Cluster] = gClusters
-  val edges : List[Edge] = gEdges
+  val edges : Set[Edge] = gEdges.toSet
 
   // Given a list of edges, a set of nodes that have been collapsed, and the
   // node representing the collapsed nodes for a given cluster, we remove all
   // edges that are between two separate collapsed nodes, and redirect edges
   // between (preserved, collapsed) pairs. Other edges are left unchanged.
-  private def collapseEdges (edges : List[Edge], removeSet : Set[Node], collapseNode : Node) : List[Edge] = {
-    edges.foldRight (List() : List[Edge]) { case (edge : Edge, partEdges : List[Edge]) =>
+  private def collapseEdges (edges : Set[Edge], removeSet : Set[Node], collapseNode : Node) : Set[Edge] = {
+    edges.foldRight (Set() : Set[Edge]) { case (edge : Edge, partEdges : Set[Edge]) =>
       (removeSet.contains(edge.fromNode), removeSet.contains(edge.toNode)) match {
         // Both nodes in the edge were collapsed, so don't bother drawing the edge
         case (true, true)   => partEdges
@@ -89,19 +98,19 @@ class Graph(gClusters : List[Cluster], gEdges : List[Edge]) {
         case (false, true)  => (prependUncollapsed (new Edge(edge.fromNode, collapseNode))
                                                    (partEdges))
         // If neither node was collapsed, then we don't have to change anything
-        case (false, false) => edge +: partEdges
+        case (false, false) => partEdges + edge
       }
     }
   }
 
-  private def prependUncollapsed(edge : Edge) (edges : List[Edge]) : List[Edge] = {
+  private def prependUncollapsed(edge : Edge) (edges : Set[Edge]) : Set[Edge] = {
     (edge.fromNode.isCollapseNode && edge.toNode.isCollapseNode) match {
       case true => edges
-      case false => edge +: edges
+      case false => edges + edge
     }
   }
 
-  private def collapseEdges (removeSet : Set[Node], collapseNode : Node) : List[Edge] = {
+  private def collapseEdges (removeSet : Set[Node], collapseNode : Node) : Set[Edge] = {
     collapseEdges (edges, removeSet, collapseNode)
   }
 
@@ -130,8 +139,8 @@ class Graph(gClusters : List[Cluster], gEdges : List[Edge]) {
     // For each node that represents the collapsed node for a cluster
     // (i.e., for each cluster), we remove edges that exist between two
     // collapsed nodes, and preserve all other edges.
-    val newEdges : List[Edge] = collapseNodes.zip(removedNodes).foldLeft (edges) {
-      case (newEdges : List[Edge], (node : Node, removeSet : Set[Node])) =>
+    val newEdges : Set[Edge] = collapseNodes.zip(removedNodes).foldLeft (edges) {
+      case (newEdges : Set[Edge], (node : Node, removeSet : Set[Node])) =>
         collapseEdges (newEdges, removeSet, node)
     }
 

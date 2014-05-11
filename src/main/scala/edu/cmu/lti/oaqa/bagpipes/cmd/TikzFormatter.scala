@@ -30,7 +30,7 @@ class TikzFormatter (graphArg : Graph) extends VizOutputFormat {
     val r = 0 until (cluster.clusterNodes.length)
     val numberedNodes = r.zip(cluster.clusterNodes)
     val nodes : IndexedSeq[String] =
-      numberedNodes.map {case (i, node) => formatNumNode (clusterShape) (i, node)}
+      numberedNodes.map {case (i, node) => formatNumNode (clusterShape) (cluster.clusterNodes, i, node)}
     // We insert the phase label as a node
     val nodesWithPhases : IndexedSeq[String] = insertPhaseNodes (clusterNo) (nodes)
 
@@ -59,7 +59,7 @@ class TikzFormatter (graphArg : Graph) extends VizOutputFormat {
   }
 
   // Have a default def defined, so we must override it.
-  override def formatNumNode (shape : NodeShape) (num : Int, node : Node) : String = {
+  override def formatNumNode (shape : NodeShape) (nodes : List[Node], num : Int, node : Node) : String = {
     val locText = num match {
       // We do not position the first node relative to anything, so we don't
       // need any extra positioning text.
@@ -67,7 +67,7 @@ class TikzFormatter (graphArg : Graph) extends VizOutputFormat {
       // We need relative positioning
       case n => {
         val clusterNo = node.nodeName.slice(1, node.nodeName.indexOf('_'))
-        ", below of=p" + clusterNo.toString + "_" + (n-1).toString
+        ", below of=" + nodes(n-1).nodeName
       }
     }
 
@@ -81,7 +81,7 @@ class TikzFormatter (graphArg : Graph) extends VizOutputFormat {
   // You should not use this unless you want Tikz nodes to overlap and have
   // other formatting issues.
   def formatNode (shape : NodeShape) (node : Node) : String = {
-    formatNumNode (shape) (0, node)
+    formatNumNode (shape) (List(), 0, node)
   }
 
   def formatEdge (edge : Edge) : String = {

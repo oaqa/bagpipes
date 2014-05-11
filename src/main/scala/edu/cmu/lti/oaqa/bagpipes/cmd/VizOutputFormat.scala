@@ -66,7 +66,7 @@ trait VizOutputFormat {
   def formatCluster (indexedCluster : (Int, Cluster)) : String
   def formatShape (shape : NodeShape) : String
   // By default, we ignore the node number parameter passed in
-  def formatNumNode (shape : NodeShape) (num : Int, node : Node) : String = {
+  def formatNumNode (shape : NodeShape) (nodes : List[Node], num : Int, node : Node) : String = {
     formatNode (shape) (node)
   }
   // We create a node for each option. We start with a list of options and

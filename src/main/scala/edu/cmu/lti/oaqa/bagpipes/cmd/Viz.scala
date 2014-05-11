@@ -326,8 +326,9 @@ object VizTesting {
     val theViz = new Viz(yamlStr)
     val newGraph = theViz.graph.collapseGraph(1,1)
     val graphvizFormatter = new GraphvizFormatter(newGraph)
-    val tikzFormatter = new TikzFormatter(theViz.graph)
-    println(graphvizFormatter.formatGraph())
-    // println(tikzFormatter.formatGraph())
+    // val tikzFormatter = new TikzFormatter(theViz.graph)
+    val tikzFormatter = new TikzFormatter(newGraph)
+    // println(graphvizFormatter.formatGraph())
+    println(tikzFormatter.formatGraph())
   }
 }
