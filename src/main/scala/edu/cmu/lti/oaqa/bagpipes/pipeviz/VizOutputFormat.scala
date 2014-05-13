@@ -1,4 +1,4 @@
-package edu.cmu.lti.oaqa.bagpipes.cmd
+package edu.cmu.lti.oaqa.bagpipes.pipeviz
 
 /**
  * A shape for node output.
@@ -38,14 +38,36 @@ trait VizOutputFormat {
   def graph : Graph
 
   // Maybe we are over-specifying how to do format the output, but let's just
-  // roll like this for now..
-  // Should just use the instance field of the graph to convert to a String
-  def formatGraph () : String = {
-    val r = 1 until (graph.clusters.length + 1)
-    val clusters : IndexedSeq[String] = r.zip(graph.clusters).map(formatCluster)
-    val edges : IndexedSeq[String] = graph.edges.map (formatEdge).toIndexedSeq
+  // roll like this for now...
+  // This is a private method that allows us to just pass all of the overloaded
+  // forms in through here. From the outside, we should not pass a specific
+  // graph into the visualizer besides during object instantiation.
+  private def formatGraph (g : Graph) : String = {
+    val r = 1 until (g.clusters.length + 1)
+    val clusters : IndexedSeq[String] = r.zip(g.clusters).map(formatCluster)
+    val edges : IndexedSeq[String] = g.edges.map (formatEdge).toIndexedSeq
 
     joinClustersAndEdges (clusters) (edges)
+  }
+  // This is the public facing method to visualize the graph. It just pipes the
+  // operation over to the private formatGraph method, which then does the real
+  // work.
+  // Should just use the instance field of the graph to convert to a String
+  def formatGraph () : String = {
+    formatGraph(graph)
+  }
+  // This is the public facing method to visualize a collapsed graph.
+  def formatGraph (before : Int, after : Int) : String = {
+    formatGraph (graph,
+        graph.collapseGraph(1, 1))
+  }
+  // This is what does the actual work for visualizing a collapsed graph.
+  // By default, this will only view the collapsed graph.
+  // We allow implementations of this trait to define this differently.
+  // For example, there might be a hybrid visualization of the collapsed and
+  // standard graph.
+  private def formatGraph (standard : Graph, collapsed : Graph) : String = {
+    formatGraph(collapsed)
   }
 
 

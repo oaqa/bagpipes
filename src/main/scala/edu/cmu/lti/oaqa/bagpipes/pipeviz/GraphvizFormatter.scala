@@ -1,4 +1,4 @@
-package edu.cmu.lti.oaqa.bagpipes.cmd
+package edu.cmu.lti.oaqa.bagpipes.pipeviz
 
 /**
  * The output format for Graphviz.
@@ -28,6 +28,7 @@ class GraphvizFormatter (graphArg : Graph) extends VizOutputFormat {
     ((makeIndent (4) (1)) + "subgraph cluster_" + clusterNo.toString() + " {\n"
         + (makeIndent (4) (2)) + clusterLabel + "\n"
         + (makeIndent (4) (2)) + nodeParams.mkString("\n" + (makeIndent (4) (2)))
+        + "\n" + (makeIndent (4) (2)) + (cluster.clusterNodes.map(x => x.nodeName)).mkString(" -> ") + " [style=\"invis\"];"
         + "\n" + (makeIndent (4) (1)) + "}")
   }
 

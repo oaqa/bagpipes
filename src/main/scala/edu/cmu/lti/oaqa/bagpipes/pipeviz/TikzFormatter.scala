@@ -1,4 +1,4 @@
-package edu.cmu.lti.oaqa.bagpipes.cmd
+package edu.cmu.lti.oaqa.bagpipes.pipeviz
 
 /**
  * The output format for Tikz.

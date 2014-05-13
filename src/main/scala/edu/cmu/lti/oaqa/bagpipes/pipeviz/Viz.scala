@@ -1,4 +1,4 @@
-package edu.cmu.lti.oaqa.bagpipes.cmd
+package edu.cmu.lti.oaqa.bagpipes.pipeviz
 
 /*
  * A visualizer tool for creating a data-structure representing pipelines,
@@ -324,11 +324,11 @@ object VizTesting {
                     + "      parameter-b: [value300, value400]\n")
 
     val theViz = new Viz(yamlStr)
-    val newGraph = theViz.graph.collapseGraph(1,1)
-    val graphvizFormatter = new GraphvizFormatter(newGraph)
-    // val tikzFormatter = new TikzFormatter(theViz.graph)
-    val tikzFormatter = new TikzFormatter(newGraph)
+    val graphvizFormatter = new GraphvizFormatter(theViz.graph)
+    val tikzFormatter = new TikzFormatter(theViz.graph)
     // println(graphvizFormatter.formatGraph())
-    println(tikzFormatter.formatGraph())
+    println(graphvizFormatter.formatGraph(1,1))
+    // println(tikzFormatter.formatGraph())
+    // println(tikzFormatter.formatGraph(2, 2))
   }
 }

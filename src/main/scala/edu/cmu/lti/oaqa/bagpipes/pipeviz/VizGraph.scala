@@ -1,4 +1,4 @@
-package edu.cmu.lti.oaqa.bagpipes.cmd
+package edu.cmu.lti.oaqa.bagpipes.pipeviz
 
 import scala.util.matching.Regex
 
