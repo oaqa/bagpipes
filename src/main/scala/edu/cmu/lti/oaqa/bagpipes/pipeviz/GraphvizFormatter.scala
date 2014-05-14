@@ -6,8 +6,8 @@ package edu.cmu.lti.oaqa.bagpipes.pipeviz
  * formatted Graphviz string, use the method `formatGraph`.
  */
 
-class GraphvizFormatter (graphArg : Graph) extends VizOutputFormat {
-  val graph = graphArg
+class GraphvizFormatter (vizArg : Viz) extends VizOutputFormat {
+  val viz : Viz = vizArg
 
   val shapeStrs = Vector("box", "ellipse", "rectangle", "diamond",
       "parallelogram", "house", "hexagon", "trapezium", "egg",

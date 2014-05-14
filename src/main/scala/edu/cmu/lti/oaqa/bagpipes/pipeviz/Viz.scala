@@ -43,6 +43,7 @@ class Viz(yamlStr : String) {
   }
 
   val graph : Graph = yaml2Graph().get
+  val tree : TreeGraph = renameNodes ("", genTreeBranches (graph.clusters))
 
   // Accessor to get the yaml string
   def yaml() : String = yamlStr
@@ -276,6 +277,28 @@ class Viz(yamlStr : String) {
         (new Node(nodeName, head)) :: tailNodes
     }
   }
+
+  def genTreeBranches (clusters : List[Cluster]) : TreeGraph = {
+    clusters match {
+      case c :: cs =>
+        val treeBelow : TreeGraph = genTreeBranches (cs)
+        TreeGraphBranches(c.clusterName, c.clusterNodes.map (x => (x, treeBelow)))
+      case Nil => TreeGraphLeaf()
+    }
+  }
+
+  def renameNodes (namePrefix : String, ct : TreeGraph) : TreeGraph = {
+    ct match {
+      case TreeGraphLeaf() => TreeGraphLeaf()
+      case TreeGraphBranches(cName, theBranches) =>
+        TreeGraphBranches(cName, theBranches.map {
+          case (node, branch) =>
+            val newNode = new Node(namePrefix + node.nodeName, node.nodeLabel)
+            val newBranch = renameNodes (newNode.nodeName + "__", branch)
+            (newNode, newBranch)
+        })
+    }
+  }
 }
 
 
@@ -324,8 +347,8 @@ object VizTesting {
                     + "      parameter-b: [value300, value400]\n")
 
     val theViz = new Viz(yamlStr)
-    val graphvizFormatter = new GraphvizFormatter(theViz.graph)
-    val tikzFormatter = new TikzFormatter(theViz.graph)
+    val graphvizFormatter = new GraphvizFormatter(theViz)
+    val tikzFormatter = new TikzFormatter(theViz)
     // println(graphvizFormatter.formatGraph())
     println(graphvizFormatter.formatGraph(1,1))
     // println(tikzFormatter.formatGraph())

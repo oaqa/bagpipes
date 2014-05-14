@@ -35,17 +35,17 @@ trait VizOutputFormat {
   def availableShapes : Vector[NodeShape] =
     shapeStrs.map ((shapeStr) => new NodeShape(shapeStr))
 
-  def graph : Graph
+  def viz : Viz
 
   // Maybe we are over-specifying how to do format the output, but let's just
   // roll like this for now...
   // This is a private method that allows us to just pass all of the overloaded
   // forms in through here. From the outside, we should not pass a specific
   // graph into the visualizer besides during object instantiation.
-  private def formatGraph (g : Graph) : String = {
-    val r = 1 until (g.clusters.length + 1)
-    val clusters : IndexedSeq[String] = r.zip(g.clusters).map(formatCluster)
-    val edges : IndexedSeq[String] = g.edges.map (formatEdge).toIndexedSeq
+  private def formatGraph (graph : Graph) : String = {
+    val r = 1 until (graph.clusters.length + 1)
+    val clusters : IndexedSeq[String] = r.zip(graph.clusters).map(formatCluster)
+    val edges : IndexedSeq[String] = graph.edges.map (formatEdge).toIndexedSeq
 
     joinClustersAndEdges (clusters) (edges)
   }
@@ -54,12 +54,12 @@ trait VizOutputFormat {
   // work.
   // Should just use the instance field of the graph to convert to a String
   def formatGraph () : String = {
-    formatGraph(graph)
+    formatGraph(viz.graph)
   }
   // This is the public facing method to visualize a collapsed graph.
   def formatGraph (before : Int, after : Int) : String = {
-    formatGraph (graph,
-        graph.collapseGraph(1, 1))
+    formatGraph (viz.graph,
+        viz.graph.collapseGraph(1, 1))
   }
   // This is what does the actual work for visualizing a collapsed graph.
   // By default, this will only view the collapsed graph.
@@ -69,20 +69,6 @@ trait VizOutputFormat {
   private def formatGraph (standard : Graph, collapsed : Graph) : String = {
     formatGraph(collapsed)
   }
-
-
-//  def formatGraph (before : Int, after : Int) : String = {
-//    val r = 1 until (graph.clusters.length + 1)
-//    val collapsedGraph
-//    val clusters : IndexedSeq[String] = r.zip(graph.clusters).map(formatCluster (before, after) (_))
-//    val edges : IndexedSeq[String] = graph.edges.map
-//
-//    joinClustersAndEdges (clusters) (edges)
-//  }
-//
-//  def formatGraph (numVis : Int) : String = {
-//    formatGraph (numVis, numVis)
-//  }
 
   // Converts a given phase to its string representation for the output format.
   def formatCluster (indexedCluster : (Int, Cluster)) : String
