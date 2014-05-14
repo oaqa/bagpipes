@@ -42,6 +42,8 @@ class Viz(yamlStr : String) {
       )
   }
 
+  // These are the important representation values that we pass along to output
+  // formatters.
   val graph : Graph = yaml2Graph().get
   val tree : TreeGraph = renameNodes ("", genTreeBranches (graph.clusters))
 

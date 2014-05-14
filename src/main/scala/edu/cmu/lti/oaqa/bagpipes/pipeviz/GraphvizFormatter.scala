@@ -14,14 +14,13 @@ class GraphvizFormatter (vizArg : Viz) extends VizOutputFormat {
       "circle", "oval")
 
   def formatCluster (x : (Int, Cluster)) : String = {
-    val clusterNo : Int = x._1
-    val clusterShape : NodeShape = availableShapes(clusterNo)
-    val cluster : Cluster = x._2
+    val (clusterNo, cluster) = x
+    val clusterShape : NodeShape = availableShape(clusterNo)
 
     val clusterLabel = "label=\"" + cluster.clusterName + "\";"
     // A list of node declarations along with the node parameters
     val nodeParams : List[String] =
-      cluster.clusterNodes.map (formatNode (clusterShape ) (_))
+      cluster.clusterNodes.map (formatNode (clusterShape) (_))
 
     // We create a subgraph section. This includes the section header, a
     // subgraph cluster label, and the list of nodes within that subgraph

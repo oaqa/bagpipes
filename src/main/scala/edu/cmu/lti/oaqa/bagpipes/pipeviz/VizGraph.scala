@@ -44,8 +44,8 @@ class Cluster(cName : String, cNodes : List[Node]) {
   // When we collapse a Cluster, we keep only the union of the first `before`
   // nodes and the last `after` nodes. In between these two sections, if there
   // are any missing nodes, we replace them with a special Node with the node
-  // name "<COLLAPSED_NODES:clusterName>".
-  // So, the collapse node name has the prefix: "<COLLAPSED_NODES:", then the
+  // name "<COLLAPSED_NODES_clusterName>".
+  // So, the collapse node name has the prefix: "<COLLAPSED_NODES_", then the
   // `clusterName` value, then the suffix ">".
   def collapseCluster (before : Int, after : Int) : (Cluster, Set[Node], Option[Node]) = {
     val cNode = new Node(clusterName, "...", true)

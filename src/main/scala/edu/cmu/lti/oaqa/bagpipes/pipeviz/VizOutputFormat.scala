@@ -32,8 +32,15 @@ trait VizOutputFormat {
   // these methods if that use case pops up.
   def shapeStrs : Vector[String]
 
-  def availableShapes : Vector[NodeShape] =
+  val availableShapes : Vector[NodeShape] =
     shapeStrs.map ((shapeStr) => new NodeShape(shapeStr))
+
+  // Use this to set the node shape per cluster. Wraps around by modular
+  // arithmetic.
+  def availableShape (shapeNo : Int) : NodeShape = {
+    val len = availableShapes.length
+    availableShapes(shapeNo % len)
+  }
 
   def viz : Viz
 
@@ -59,7 +66,7 @@ trait VizOutputFormat {
   // This is the public facing method to visualize a collapsed graph.
   def formatGraph (before : Int, after : Int) : String = {
     formatGraph (viz.graph,
-        viz.graph.collapseGraph(1, 1))
+        viz.graph.collapseGraph(before, after))
   }
   // This is what does the actual work for visualizing a collapsed graph.
   // By default, this will only view the collapsed graph.

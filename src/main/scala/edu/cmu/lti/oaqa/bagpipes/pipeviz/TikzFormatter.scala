@@ -16,7 +16,7 @@ class TikzFormatter (vizArg : Viz) extends VizOutputFormat {
   // Converts a given phase to its string representation for the output format.
   def formatCluster (x : (Int, Cluster)) : String = {
     val clusterNo : Int = x._1
-    val clusterShape : NodeShape = availableShapes(clusterNo)
+    val clusterShape : NodeShape = availableShape(clusterNo)
     val cluster : Cluster = x._2
 
     // All clusters after the first one must be positioned to the right of the
