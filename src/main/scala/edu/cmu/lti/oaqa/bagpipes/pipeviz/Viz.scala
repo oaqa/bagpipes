@@ -351,8 +351,10 @@ object VizTesting {
     val theViz = new Viz(yamlStr)
     val graphvizFormatter = new GraphvizFormatter(theViz)
     val tikzFormatter = new TikzFormatter(theViz)
+    val d3Formatter = new D3Formatter(theViz)
+    println(d3Formatter.formatTree())
     // println(graphvizFormatter.formatGraph())
-    println(graphvizFormatter.formatGraph(1,1))
+    // println(graphvizFormatter.formatGraph(1,1))
     // println(tikzFormatter.formatGraph())
     // println(tikzFormatter.formatGraph(2, 2))
   }

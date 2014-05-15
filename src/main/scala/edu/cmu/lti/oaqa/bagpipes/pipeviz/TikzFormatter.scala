@@ -103,4 +103,9 @@ class TikzFormatter (vizArg : Viz) extends VizOutputFormat {
         + (makeIndent (2) (1)) + edges.mkString("\n" + (makeIndent (2) (1))) + "\n"
         + latexClosingText + "\n")
   }
+
+  // TODO implement this feature
+  def formatTree (tree : TreeGraph) : String = {
+    ""
+  }
 }

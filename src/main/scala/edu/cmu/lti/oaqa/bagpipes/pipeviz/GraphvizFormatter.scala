@@ -52,4 +52,9 @@ class GraphvizFormatter (vizArg : Viz) extends VizOutputFormat {
         + (makeIndent (4) (1)) + edges.mkString("\n" + (makeIndent (4) (1)))
         + "\n}")
   }
+
+  // TODO implement this feature
+  def formatTree (tree : TreeGraph) : String = {
+    ""
+  }
 }

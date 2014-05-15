@@ -32,7 +32,7 @@ trait VizOutputFormat {
   // these methods if that use case pops up.
   def shapeStrs : Vector[String]
 
-  val availableShapes : Vector[NodeShape] =
+  def availableShapes : Vector[NodeShape] =
     shapeStrs.map ((shapeStr) => new NodeShape(shapeStr))
 
   // Use this to set the node shape per cluster. Wraps around by modular
@@ -43,6 +43,10 @@ trait VizOutputFormat {
   }
 
   def viz : Viz
+
+  ///////////////////////////////////
+  // Graph related formatting code //
+  ///////////////////////////////////
 
   // Maybe we are over-specifying how to do format the output, but let's just
   // roll like this for now...
@@ -92,4 +96,14 @@ trait VizOutputFormat {
   // edges, we join them along with any other necessary formatting to form
   // the final output string.
   def joinClustersAndEdges (clusters : IndexedSeq[String]) (edges : IndexedSeq[String]) : String
+
+
+  //////////////////////////////////
+  // Tree related formatting code //
+  //////////////////////////////////
+  def formatTree (tree : TreeGraph) : String
+
+  def formatTree () : String = {
+    formatTree (viz.tree)
+  }
 }
